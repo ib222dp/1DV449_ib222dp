@@ -1,11 +1,14 @@
 <?php
 
-curl_get_request("localhost:8080");
+require_once("HTMLView.php");
+require_once("controller.php");
 
-function curl_get_request($url){
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
 
-    $data = curl_exec($ch);
-    curl_close($ch); 
-}
+$HTMLView = new HTMLView();
+$controller = new Controller();
+
+//Anropar metod som returnerar det som ska visas i HTMLView:s body
+$htmlBody = $controller->control();
+
+//Anropar metod för att eka ut htmlBody
+$HTMLView->echoHTML($htmlBody);
