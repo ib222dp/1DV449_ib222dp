@@ -25,6 +25,10 @@ class Controller {
 
             $friendDates = $this->model->getFriendDates($friendArray);
 
+            $friendMovieDays = $this->model->getFriendMovieDays($friendDates);
+
+            $movies = $this->model->getMovies($friendMovieDays, $menuLinks);
+
         } else {
             $ret = $this->view->showURLForm();
         }

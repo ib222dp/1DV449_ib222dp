@@ -60,12 +60,107 @@ class Model
             $friendDates = $xpath->query('//td');
             array_push($frDatesArray, $friendDates);
         }
+        return $frDatesArray;
+    }
 
-        foreach($frDatesArray[0] as $paul) {
-            $availability = $paul->nodeValue;
+    public function getFriendMovieDays($frDatesArray) {
+
+        $availArray = array();
+
+        $ok = "ok";
+
+        foreach($frDatesArray as $friendDates) {
+
+            $arrLength = $friendDates->length;
+
+            for ($i = 0; $i < $arrLength; $i++) {
+
+                $availability = $friendDates[$i]->nodeValue;
+
+                if ($i == 0) {
+                    if (strcasecmp($ok, $availability) == 0) {
+                        $avail = "fri";
+                    } else {
+                        $avail = "no";
+                    }
+                }
+                if ($i == 1) {
+                    if (strcasecmp($ok, $availability) == 0) {
+                        $avail = "sat";
+                    } else {
+                        $avail = "no";
+                    }
+                }
+                if ($i == 2) {
+                    if (strcasecmp($ok, $availability) == 0) {
+                        $avail = "sun";
+                    } else {
+                        $avail = "no";
+                    }
+                }
+
+                array_push($availArray, $avail);
+            }
         }
+
+        $count = array_count_values($availArray);
+
+        $movieDayArray = array();
+
+        if($count["fri"] == 3){
+            $friday = "Fredag";
+            array_push($movieDayArray, $friday);
+        } if($count["sat"] == 3) {
+            $saturday = "Lördag";
+            array_push($movieDayArray, $saturday);
+        } if($count["sun"] == 3) {
+            $sunday = "Söndag";
+            array_push($movieDayArray, $sunday);
+        }
+
+        return $movieDayArray;
+    }
+
+    public function getMovies($friendMovieDays, $menuLinks) {
+
+        $movieLink = $menuLinks->item(1);
+
+        $url = $_SESSION["givenURL"] . $movieLink->getAttribute("href") . "/";
+
+        $page = $this->getPage($url);
+
+        $xpath = $this->loadHTML($page);
+
+        $daySelect = $xpath->query('//select[@name = "day"]//option');
+
+        $movieSelect = $xpath->query('//select[@name = "movie"]//option');
+
+        $jsonURL = $url . "check?day=" . "02" . "&movie=" . "02";
+
+        $json = $this->getPage($jsonURL);
+
+        var_dump($json);
+
+        die;
 
 
     }
+
+    public function curl_cookie_handling($url) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+
+        $postArr = array("code" => "1234");
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postArr);
+
+        $data = curl_exec($ch);
+        curl_close($ch);
+    }
+
+
+
 
 }
