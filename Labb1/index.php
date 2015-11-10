@@ -1,14 +1,19 @@
 <?php
 
 require_once("HTMLView.php");
-require_once("controller.php");
+require_once("MovieController.php");
+require_once("TableController.php");
 
+session_start();
 
 $HTMLView = new HTMLView();
-$controller = new Controller();
+$movieController = new MovieController();
 
-//Anropar metod som returnerar det som ska visas i HTMLView:s body
-$htmlBody = $controller->control();
+if($movieController->moviesChosen()){
+    $tableController = new TableController();
+    $htmlBody = $tableController->start();
+} else {
+    $htmlBody = $movieController->start();
+}
 
-//Anropar metod för att eka ut htmlBody
 $HTMLView->echoHTML($htmlBody);

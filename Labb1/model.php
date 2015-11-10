@@ -133,16 +133,82 @@ class Model
 
         $daySelect = $xpath->query('//select[@name = "day"]//option');
 
-        $movieSelect = $xpath->query('//select[@name = "movie"]//option');
+        $movieSelect = $xpath->query('//select[@name = "movie"]//option[@value]');
 
-        $jsonURL = $url . "check?day=" . "02" . "&movie=" . "02";
+        $jsonArray = array();
 
-        $json = $this->getPage($jsonURL);
+        //unset($friendMovieDays);
+        //$friendMovieDays = array("Fredag", "Lördag", "Söndag");
 
-        var_dump($json);
+        foreach($friendMovieDays as $friendDay) {
+            foreach ($daySelect as $movieDay) {
+                if (strcasecmp($movieDay->nodeValue, $friendDay) == 0) {
+                    foreach ($movieSelect as $movieOpt) {
 
-        die;
+                        $jsonURL = $url."check?day=".$movieDay->getAttribute("value").
+                            "&movie=".$movieOpt->getAttribute("value");
 
+                        $json = $this->getPage($jsonURL);
+
+                        $movies = json_decode($json);
+
+                        foreach($movies as $movie) {
+                            if ($movie->status == 1) {
+                                $movie->day = $friendDay;
+                                array_push($jsonArray, $movie);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($jsonArray as $movie) {
+            foreach ($movieSelect as $movieOption) {
+                if (strcasecmp($movieOption->getAttribute("value"), $movie->movie) == 0) {
+                    $movie->movie = $movieOption->nodeValue;
+                }
+            }
+        }
+
+        return $jsonArray;
+    }
+
+    public function getTable($day, $time){
+
+        $earliestTime = date('H',strtotime('+2 hours', strtotime($time)));
+
+        $page = $this->getPage($_SESSION["givenURL"]);
+
+        $menuLinks = $this->getMenuLinks($page);
+
+        $tableURL = $menuLinks->item(2);
+
+        $tableLink = $_SESSION["givenURL"] . $tableURL->getAttribute("href") . "/";
+
+        $tablePage = $this->getPage($tableLink);
+
+        $xpath = $this->loadHTML($tablePage);
+
+        if(strcasecmp($day, "Fredag") == 0) {
+            $section = $xpath->query("//div[@class = 'WordSection2']//p//input");
+        } elseif(strcasecmp($day, "Lördag" == 0)) {
+            $section =  $xpath->query("//div[@class = 'WordSection4']//p//input");
+        } else {
+            $section =  $xpath->query("//div[@class = 'WordSection6']//p//input");
+        }
+
+        $timeArray = array();
+
+        foreach($section as $input) {
+
+            $bTime = substr($input->getAttribute("value"), 3, -2);
+            $bookTime = date_create_from_format('H', $bTime);
+
+            if($bookTime >= $earliestTime) {
+                array_push($timeArray, $input);
+            }
+        }
 
     }
 

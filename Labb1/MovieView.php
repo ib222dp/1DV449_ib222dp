@@ -1,6 +1,6 @@
 <?php
 
-class View
+class MovieView extends View
 {
     private $model;
     private $urlForm;
@@ -24,6 +24,33 @@ class View
     public function showURLForm() {
         $ret = $this->urlForm;
         return $ret;
+    }
+
+    public function moviesChosen() {
+        if(array_key_exists(self::$dayParam, $_GET)) {
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public function showMovies($movies) {
+
+        $header = "<h1>Följande filmer hittades</h1><ul>";
+
+        $list = null;
+
+        foreach ($movies as $movie) {
+            $list .= "<li>Filmen <b>" . $movie->movie . "</b> klockan " . $movie->time . " på "
+                . $movie->day . " <a href='?day=" . $movie->day . "&time=" . $movie->time . "'>Välj denna film och boka bord</a></li>";
+        }
+
+        $ul = "</ul>";
+
+        $ret = $header . $list . $ul;
+
+        return $ret;
+
     }
 
     //Hämtar url

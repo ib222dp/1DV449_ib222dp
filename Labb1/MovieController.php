@@ -1,18 +1,27 @@
 <?php
-require_once("Model.php");
-require_once("View.php");
+require_once("model.php");
+require_once("AbView.php");
+require_once("MovieView.php");
 
-class Controller {
+class MovieController {
     private $model;
     private $view;
 
     //Konstruktor
     public function __construct() {
         $this->model = new Model();
-        $this->view = new View($this->model);
+        $this->view = new MovieView($this->model);
     }
 
-    public function control(){
+    public function moviesChosen() {
+        if($this->view->moviesChosen()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function start(){
 
         if($this->view->userPressedSubmit()) {
             $url = $this->view->getURL();
@@ -28,6 +37,8 @@ class Controller {
             $friendMovieDays = $this->model->getFriendMovieDays($friendDates);
 
             $movies = $this->model->getMovies($friendMovieDays, $menuLinks);
+
+            $ret = $this->view->showMovies($movies);
 
         } else {
             $ret = $this->view->showURLForm();
