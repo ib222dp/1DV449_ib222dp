@@ -2,6 +2,15 @@
 
 class Model
 {
+    public function destroySession() {
+        $_SESSION = array();
+
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+        }
+        session_destroy();
+    }
 
     public function getPage($url) {
         $ch = curl_init();
@@ -188,6 +197,8 @@ class Model
 
         $tablePage = $this->getPage($tableLink);
 
+        libxml_use_internal_errors(true);
+
         $xpath = $this->loadHTML($tablePage);
 
         if(strcasecmp($day, "Fredag") == 0) {
@@ -203,30 +214,18 @@ class Model
         foreach($section as $input) {
 
             $bTime = substr($input->getAttribute("value"), 3, -2);
-            $bookTime = date_create_from_format('H', $bTime);
 
-            if($bookTime >= $earliestTime) {
-                array_push($timeArray, $input);
+            if((int)$bTime >= (int)$earliestTime) {
+                array_push($timeArray, $bTime);
             }
         }
 
+        foreach($timeArray as &$tTime) {
+            $endTime = (int)$tTime + 2;
+            $tTime = $tTime . "-" . $endTime;
+        }
+
+        return $timeArray;
     }
-
-    public function curl_cookie_handling($url) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-
-        $postArr = array("code" => "1234");
-
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postArr);
-
-        $data = curl_exec($ch);
-        curl_close($ch);
-    }
-
-
-
 
 }

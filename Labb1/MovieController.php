@@ -13,8 +13,8 @@ class MovieController {
         $this->view = new MovieView($this->model);
     }
 
-    public function moviesChosen() {
-        if($this->view->moviesChosen()){
+    public function movieChosen() {
+        if($this->view->movieChosen()){
             return true;
         } else {
             return false;
@@ -23,8 +23,13 @@ class MovieController {
 
     public function start(){
 
-        if($this->view->userPressedSubmit()) {
-            $url = $this->view->getURL();
+        if($this->view->userPressedSubmit() || $this->view->moviesListed()){
+
+            if($this->view->userPressedSubmit()) {
+                $url = $this->view->getURL();
+            }else {
+                $url = $_SESSION["givenURL"];
+            }
 
             $page = $this->model->getPage($url);
 
@@ -39,8 +44,10 @@ class MovieController {
             $movies = $this->model->getMovies($friendMovieDays, $menuLinks);
 
             $ret = $this->view->showMovies($movies);
-
         } else {
+
+            $this->model->destroySession();
+
             $ret = $this->view->showURLForm();
         }
 

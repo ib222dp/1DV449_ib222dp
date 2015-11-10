@@ -27,4 +27,28 @@ class TableView extends View
         }
     }
 
+    public function showTableTimes($tableTimes) {
+
+        $link = "<a href='index.php?movies'>Tillbaka</a>";
+
+        $header = "<h1>Följande tider hittades</h1><ul>";
+
+        if(empty($tableTimes)) {
+            $ret = $link . "<p>Inga lediga bord finns</p>";
+        }else {
+            $list = null;
+
+            foreach ($tableTimes as $time) {
+
+                $list .= "<li>Det finns ett ledigt bord <b>kl " . $time . "</b></li>";
+            }
+
+            $ul = "</ul>";
+
+            $ret = $link . $header . $list . $ul;
+        }
+
+        return $ret;
+    }
+
 }

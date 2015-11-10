@@ -9,7 +9,7 @@ session_start();
 $HTMLView = new HTMLView();
 $movieController = new MovieController();
 
-if($movieController->moviesChosen()){
+if($movieController->movieChosen()){
     $tableController = new TableController();
     $htmlBody = $tableController->start();
 } else {

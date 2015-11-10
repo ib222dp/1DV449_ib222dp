@@ -18,7 +18,9 @@ class TableController {
         $day = $this->view->getMovieDay();
         $time = $this->view->getMovieTime();
 
-        $tables = $this->model->getTable($day, $time);
+        $tableTimes = $this->model->getTable($day, $time);
+
+        $ret = $this->view->showTableTimes($tableTimes);
 
         return $ret;
     }

@@ -10,7 +10,7 @@ class MovieView extends View
         $this->model = $model;
 
         $this->urlForm .= "
-                            <form action='index.php' method='post'>
+                            <form action='index.php?movies' method='post'>
 							<fieldset>
 							<legend>Labb1</legend>
 							<label>Ange URL: </label>
@@ -26,7 +26,15 @@ class MovieView extends View
         return $ret;
     }
 
-    public function moviesChosen() {
+    public function moviesListed() {
+        if(array_key_exists(self::$movieParam, $_GET)) {
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public function movieChosen() {
         if(array_key_exists(self::$dayParam, $_GET)) {
             return true;
         }else {
@@ -35,6 +43,8 @@ class MovieView extends View
     }
 
     public function showMovies($movies) {
+
+        $link = "<a href='index.php'>Tillbaka</a>";
 
         $header = "<h1>Följande filmer hittades</h1><ul>";
 
@@ -47,7 +57,7 @@ class MovieView extends View
 
         $ul = "</ul>";
 
-        $ret = $header . $list . $ul;
+        $ret = $link . $header . $list . $ul;
 
         return $ret;
 
