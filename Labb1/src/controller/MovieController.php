@@ -1,7 +1,8 @@
 <?php
-require_once("model.php");
-require_once("AbView.php");
-require_once("MovieView.php");
+require_once("src/model/model.php");
+require_once("src/model/MovieModel.php");
+require_once("src/view/AbView.php");
+require_once("src/view/MovieView.php");
 
 class MovieController {
     private $model;
@@ -9,10 +10,11 @@ class MovieController {
 
     //Konstruktor
     public function __construct() {
-        $this->model = new Model();
+        $this->model = new MovieModel();
         $this->view = new MovieView($this->model);
     }
 
+    //Kontrollerar om användaren har valt en film
     public function movieChosen() {
         if($this->view->movieChosen()){
             return true;
@@ -27,27 +29,30 @@ class MovieController {
 
             if($this->view->userPressedSubmit()) {
                 $url = $this->view->getURL();
+                if($this->model->inputOK($url)) {
+                    $this->model->setURL($url);
+                }else {
+                    $ret = $this->view->showValPage();
+                }
+
             }else {
                 $url = $_SESSION["givenURL"];
             }
 
-            $page = $this->model->getPage($url);
-
-            $menuLinks = $this->model->getMenuLinks($page);
+            $menuLinks = $this->model->getMenuLinks($url);
 
             $friendArray = $this->model->getFriendLinks($menuLinks);
 
-            $friendDates = $this->model->getFriendDates($friendArray);
+            $dayLists = $this->model->getFriendDays($friendArray);
 
-            $friendMovieDays = $this->model->getFriendMovieDays($friendDates);
+            $movieDays = $this->model->calculateMovieDays($dayLists);
 
-            $movies = $this->model->getMovies($friendMovieDays, $menuLinks);
+            $movies = $this->model->getMovies($movieDays, $menuLinks);
 
             $ret = $this->view->showMovies($movies);
+
         } else {
-
             $this->model->destroySession();
-
             $ret = $this->view->showURLForm();
         }
 

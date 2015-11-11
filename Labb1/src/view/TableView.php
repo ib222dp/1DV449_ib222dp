@@ -9,6 +9,7 @@ class TableView extends View
         $this->model = $model;
     }
 
+    //Hämtar vald dag från url:en
     public function getMovieDay() {
         if(isset($_GET[self::$dayParam])) {
             $day = $_GET[self::$dayParam];
@@ -18,6 +19,7 @@ class TableView extends View
         }
     }
 
+    //Hämtar vald tid från url:en
     public function getMovieTime() {
         if(isset($_GET[self::$timeParam])) {
             $time = $_GET[self::$timeParam];
@@ -27,16 +29,17 @@ class TableView extends View
         }
     }
 
+    //Visar lediga bord för den valda dagen och tiden
     public function showTableTimes($tableTimes) {
 
         $link = "<a href='index.php?movies'>Tillbaka</a>";
 
-        $header = "<h1>Följande tider hittades</h1><ul>";
-
         if(empty($tableTimes)) {
             $ret = $link . "<p>Inga lediga bord finns</p>";
         }else {
-            $list = null;
+            $header = "<h1>Följande tider hittades</h1><ul>";
+
+            $list = '';
 
             foreach ($tableTimes as $time) {
 

@@ -6,6 +6,7 @@ abstract class View
     protected static $timeParam = "time";
     protected static $movieParam = "movies";
 
+    //Konstruktor
     public function __construct() {
 
     }
