@@ -19,10 +19,8 @@ class TableController {
         $day = $this->view->getMovieDay();
         $time = $this->view->getMovieTime();
 
-        $menuLinks = $this->model->getMenuLinks($_SESSION["givenURL"]);
-
         //Hämtar och visar lediga bord för den valda dagen och tiden
-        $tableTimes = $this->model->getTableTimes($day, $time, $menuLinks);
+        $tableTimes = $this->model->getTableTimes($day, $time);
         $ret = $this->view->showTableTimes($tableTimes);
 
         return $ret;

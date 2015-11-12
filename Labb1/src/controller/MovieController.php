@@ -24,38 +24,29 @@ class MovieController {
     }
 
     public function start(){
-
-        if($this->view->userPressedSubmit() || $this->view->moviesListed()){
-
-            if($this->view->userPressedSubmit()) {
-                $url = $this->view->getURL();
-                if($this->model->inputOK($url)) {
-                    $this->model->setURL($url);
-                }else {
-                    $ret = $this->view->showValPage();
-                }
-
+        if($this->view->userPressedSubmit()){
+            $startURL = $this->view->getURL();
+            if($this->model->inputOK($startURL)) {
+                $this->model->setURL($startURL);
+                $ret = $this->showMovieList();
             }else {
-                $url = $_SESSION["givenURL"];
+                $ret = $this->view->showValPage();
             }
-
-            $menuLinks = $this->model->getMenuLinks($url);
-
-            $friendArray = $this->model->getFriendLinks($menuLinks);
-
-            $dayLists = $this->model->getFriendDays($friendArray);
-
-            $movieDays = $this->model->calculateMovieDays($dayLists);
-
-            $movies = $this->model->getMovies($movieDays, $menuLinks);
-
-            $ret = $this->view->showMovies($movies);
-
+        } elseif($this->view->moviesListed()) {
+            $ret = $this->showMovieList();
         } else {
             $this->model->destroySession();
             $ret = $this->view->showURLForm();
         }
+        return $ret;
+    }
 
+    public function showMovieList(){
+        $friends = $this->model->getFriends();
+        $dayLists = $this->model->getDayLists($friends);
+        $movieDays = $this->model->calculateMovieDays($dayLists);
+        $movies = $this->model->getMovies($movieDays);
+        $ret = $this->view->showMovies($movies);
         return $ret;
     }
 

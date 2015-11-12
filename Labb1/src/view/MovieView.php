@@ -48,43 +48,23 @@ class MovieView extends View
     }
 
     public function showValPage(){
-        $form = "
-                            <form action='index.php?movies' method='post'>
-							<fieldset>
-							<legend>Labb1</legend>
-							<label>Ange URL: </label>
-							<input type='text' name='url'/>
-							<input type='submit' name='submitButton' value='Ange url'/>
-							</fieldset>
-							</form>";
-
-        $message = "<p>URL saknas</p>";
-
-        $ret = $form . $message;
-        return $ret;
-
+        return  "<a href='index.php'>Tillbaka</a>
+                <p>URL saknas</p>";
     }
 
     //Visar de filmer som går när alla tre är lediga
     public function showMovies($movies) {
-
         $link = "<a href='index.php'>Tillbaka</a>";
-
         $header = "<h1>Följande filmer hittades</h1><ul>";
-
         $list = '';
-
         foreach ($movies as $movie) {
             $list .= "<li>Filmen <b>" . $movie->movie . "</b> klockan " . $movie->time . " på "
-                . $movie->day . " <a href='?day=" . $movie->day . "&time=" . $movie->time . "'>Välj denna film och boka bord</a></li>";
+                . $movie->day . " <a href='?day=" . $movie->day . "&time=" . $movie->time
+                . "'>Välj denna film och boka bord</a></li>";
         }
-
         $ul = "</ul>";
-
         $ret = $link . $header . $list . $ul;
-
         return $ret;
-
     }
 
     //Visar formulär för att ange URL

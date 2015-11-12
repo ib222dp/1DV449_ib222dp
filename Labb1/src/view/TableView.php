@@ -31,26 +31,18 @@ class TableView extends View
 
     //Visar lediga bord för den valda dagen och tiden
     public function showTableTimes($tableTimes) {
-
         $link = "<a href='index.php?movies'>Tillbaka</a>";
-
         if(empty($tableTimes)) {
             $ret = $link . "<p>Inga lediga bord finns</p>";
         }else {
             $header = "<h1>Följande tider hittades</h1><ul>";
-
             $list = '';
-
             foreach ($tableTimes as $time) {
-
                 $list .= "<li>Det finns ett ledigt bord <b>kl " . $time . "</b></li>";
             }
-
             $ul = "</ul>";
-
             $ret = $link . $header . $list . $ul;
         }
-
         return $ret;
     }
 
