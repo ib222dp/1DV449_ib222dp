@@ -15,16 +15,33 @@ class MovieController {
     }
 
     //Kontrollerar om användaren har valt en film
-    public function movieChosen() {
-        if($this->view->movieChosen()){
+    public function dayAndTimeChosen() {
+        if($this->view->dayAndTimeChosen()){
             return true;
         } else {
             return false;
         }
     }
 
-    public function start(){
-        if($this->view->userPressedSubmit()){
+    //Kontrollerar om query-parametern "movies" finns i url:en
+    public function moviesListed() {
+        if($this->view->moviesListed()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function bookTimeChosen() {
+        if($this->view->bookTimeChosen()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function start() {
+        if($this->view->userPressedSubmit()) {
             $startURL = $this->view->getURL();
             if($this->model->inputOK($startURL)) {
                 $this->model->setURL($startURL);
@@ -33,7 +50,14 @@ class MovieController {
                 $ret = $this->view->showValPage();
             }
         } elseif($this->view->moviesListed()) {
-            $ret = $this->showMovieList();
+            if($this->model->URLIsSet() && $this->model->moviesAreSet()) {
+                $movies = $this->model->getSavedMovies();
+                $ret = $this->view->showMovies($movies);
+            }else {
+                $this->model->destroySession();
+                header('location: ' . $_SERVER['PHP_SELF']);
+                die;
+            }
         } else {
             $this->model->destroySession();
             $ret = $this->view->showURLForm();
@@ -41,12 +65,21 @@ class MovieController {
         return $ret;
     }
 
-    public function showMovieList(){
+    public function showMovieList() {
         $friends = $this->model->getFriends();
         $dayLists = $this->model->getDayLists($friends);
         $movieDays = $this->model->calculateMovieDays($dayLists);
-        $movies = $this->model->getMovies($movieDays);
-        $ret = $this->view->showMovies($movies);
+        if(empty($movieDays)) {
+            $ret = $this->view->showNoFreeDays();
+        } else {
+            $movies = $this->model->getMovies($movieDays);
+            if(empty($movies)) {
+                $ret = $this->view->showNoMovies();
+            } else {
+                $this->model->setMovies($movies);
+                $ret = $this->view->showMovies($movies);
+            }
+        }
         return $ret;
     }
 

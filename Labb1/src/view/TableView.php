@@ -30,7 +30,7 @@ class TableView extends View
     }
 
     //Visar lediga bord för den valda dagen och tiden
-    public function showTableTimes($tableTimes) {
+    public function showTableTimes($tableTimes, $day) {
         $link = "<a href='index.php?movies'>Tillbaka</a>";
         if(empty($tableTimes)) {
             $ret = $link . "<p>Inga lediga bord finns</p>";
@@ -38,7 +38,9 @@ class TableView extends View
             $header = "<h1>Följande tider hittades</h1><ul>";
             $list = '';
             foreach ($tableTimes as $time) {
-                $list .= "<li>Det finns ett ledigt bord <b>kl " . $time . "</b></li>";
+                $list .= "<li>Det finns ett ledigt bord <b>kl " . $time . "</b>
+                    <a href='?" . self::$bookDayParam . "=" . $day . "&" . self::$bookTimeParam
+                    . "=" . $time . "'>Boka detta bord</a></li>";
             }
             $ul = "</ul>";
             $ret = $link . $header . $list . $ul;

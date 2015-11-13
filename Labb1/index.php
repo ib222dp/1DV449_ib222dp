@@ -9,12 +9,15 @@ session_start();
 $HTMLView = new HTMLView();
 $movieController = new MovieController();
 
-//Kontrollerar om användaren har valt en film
-if($movieController->movieChosen()){
+//Startar controller eller dirigerar om till startsidan beroende på vilka query-parametrar som finns i url:en
+if(!count($_GET) || $movieController->moviesListed()) {
+    $htmlBody = $movieController->start();
+} elseif($movieController->dayAndTimeChosen() || $movieController->bookTimeChosen()) {
     $tableController = new TableController();
     $htmlBody = $tableController->start();
 } else {
-    $htmlBody = $movieController->start();
+    header('location: ' . $_SERVER['PHP_SELF']);
+    die;
 }
 
 $HTMLView->echoHTML($htmlBody);
