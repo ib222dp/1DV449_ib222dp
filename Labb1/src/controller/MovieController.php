@@ -32,6 +32,7 @@ class MovieController {
         }
     }
 
+    //Kontrollerar om query-parametern "booktime" finns i url:en
     public function bookTimeChosen() {
         if($this->view->bookTimeChosen()){
             return true;

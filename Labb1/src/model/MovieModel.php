@@ -39,7 +39,6 @@ class MovieModel extends Model
         $fri = "fri";
         $sat = "sat";
         $sun = "sun";
-
         //Lägger till fri,sat eller sun i availArray beroende på om vännerna är lediga(om td=ok)
         foreach($dayLists as $dayList) {
             $arrLength = $dayList->length;
@@ -98,19 +97,15 @@ class MovieModel extends Model
                         $jsonObjects = json_decode($json);
                         foreach($jsonObjects as $movie) {
                             if ($movie->status == 1) {
+                                //Byter ut movie->movie från ett nummer till namnet på filmen
+                                if (strcasecmp($movieOption->getAttribute("value"), $movie->movie) == 0) {
+                                    $movie->movie = $movieOption->nodeValue;
+                                }
                                 $movie->day = $movieDay;
                                 array_push($movies, $movie);
                             }
                         }
                     }
-                }
-            }
-        }
-        //Byter ut movie->movie från ett nummer till namnet på filmen
-        foreach($movies as $movie) {
-            foreach ($movieOptions as $movieOpt) {
-                if (strcasecmp($movieOpt->getAttribute("value"), $movie->movie) == 0) {
-                    $movie->movie = $movieOpt->nodeValue;
                 }
             }
         }

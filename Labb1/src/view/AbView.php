@@ -5,7 +5,6 @@ abstract class View
     protected static $dayParam = "day";
     protected static $timeParam = "time";
     protected static $movieParam = "movies";
-    protected static $bookDayParam = "bookday";
     protected static $bookTimeParam = "booktime";
 
     //Konstruktor
@@ -22,8 +21,9 @@ abstract class View
         }
     }
 
+    //Kontrollerar om användaren har valt ett bord (om query-parametern "booktime" finns i url:en)
     public function bookTimeChosen() {
-        if(array_key_exists(self::$bookTimeParam, $_GET) && array_key_exists(self::$bookDayParam, $_GET) ) {
+        if(array_key_exists(self::$bookTimeParam, $_GET)) {
             return true;
         }else {
             return false;

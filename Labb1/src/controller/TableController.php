@@ -17,28 +17,16 @@ class TableController {
     public function start() {
         if($this->model->URLIsSet() && $this->model->moviesAreSet()) {
             if($this->view->dayAndTimeChosen()) {
-                //Hämtar vald dag och tid från url:en
                 $day = $this->view->getMovieDay();
                 $time = $this->view->getMovieTime();
-                //Hämtar och visar lediga bord för den valda dagen och tiden
-                $tableTimes = $this->model->getTableTimes($day, $time);
-                $ret = $this->view->showTableTimes($tableTimes, $day);
+                $tables = $this->model->getTables($day, $time);
+                $ret = $this->view->showTables($tables);
             } else {
-                $url = $this->model->getSavedURL() . "/dinner/login";
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_USERAGENT, "ib222dp");
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POST, true);
-
-                $postFields = array("group1" => "lor1820", "username" => "zeke", "password" => "coys",
-                "submit" => "login");
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-
-                $data = curl_exec($ch);
-                curl_close($ch);
-                $ret = $data;
+                $bookTime = $this->view->getBookTime();
+                $formURL = $this->model->getFormURL();
+                $postFields = $this->model->getPostFields($bookTime);
+                $response = $this->model->postData($formURL, $postFields);
+                $ret = $this->view->showResponse($response);
             }
             return $ret;
         } else {

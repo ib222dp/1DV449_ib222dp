@@ -62,6 +62,12 @@ abstract class Model
         session_destroy();
     }
 
+    //Postar formulärdata och returnerar svaret
+    public function postData($formURL, $postFields) {
+        $data = $this->dao->postData($formURL, $postFields);
+        return $data;
+    }
+
     //Hämtar data via curl-anrop och returnerar json eller xpath
     public function getResponse($url, $isJson) {
         $dataAndURL = $this->dao->getDataAndURL($url);

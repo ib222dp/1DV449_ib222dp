@@ -5,12 +5,14 @@ class MovieView extends View
     private $model;
     private $button;
     private $urlField;
+    private $homeLink;
 
     //Konstruktor
     public function __construct(Model $model) {
         $this->model = $model;
         $this->button = "submitButton";
         $this->urlField = "url";
+        $this->homeLink = "<a href='index.php'>Tillbaka</a>";
     }
 
     //Kontrollerar om query-parametern "movies" finns i url:en
@@ -44,8 +46,7 @@ class MovieView extends View
 
     //Visas om url ej har angetts
     public function showValPage(){
-        return  "<a href='index.php'>Tillbaka</a>
-                <p>URL saknas</p>";
+        return $this->homeLink . "<p>URL saknas</p>";
     }
 
     //Visar formulär för att ange URL
@@ -64,26 +65,25 @@ class MovieView extends View
 
     //Visas om det inte finns någon dag när alla tre är lediga
     public function showNoFreeDays() {
-        return "<a href='index.php'>Tillbaka</a><p>Det finns ingen dag när alla tre är lediga</p>";
+        return $this->homeLink . "<p>Det finns ingen dag när alla tre är lediga</p>";
     }
 
     //Visas om det inte finns några filmer som inte är fullbokade när alla tre är lediga
     public function showNoMovies() {
-        return "<a href='index.php'>Tillbaka</a><p>Det finns inga filmer som inte är fullbokade</p>";
+        return $this->homeLink . "<p>Det finns inga filmer som inte är fullbokade</p>";
     }
 
     //Visar de filmer som går när alla tre är lediga
     public function showMovies($movies) {
-        $link = "<a href='index.php'>Tillbaka</a>";
         $header = "<h1>Följande filmer hittades</h1><ul>";
         $list = '';
         foreach ($movies as $movie) {
             $list .= "<li>Filmen <b>" . $movie->movie . "</b> klockan " . $movie->time . " på "
-                . $movie->day . "<a href='?" . self::$dayParam . "=" . $movie->day . "&" .
+                . $movie->day . " <a href='?" . self::$dayParam . "=" . $movie->day . "&" .
                 self::$timeParam . "=" . $movie->time . "'>Välj denna film och boka bord</a></li>";
         }
         $ul = "</ul>";
-        $ret = $link . $header . $list . $ul;
+        $ret = $this->homeLink . $header . $list . $ul;
         return $ret;
     }
 

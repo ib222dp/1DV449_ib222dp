@@ -3,10 +3,12 @@
 class TableView extends View
 {
     private $model;
+    private $backLink;
 
     //Konstruktor
     public function __construct(Model $model) {
         $this->model = $model;
+        $this->backLink = "<a href='index.php?movies'>Tillbaka</a>";
     }
 
     //Hämtar vald dag från url:en
@@ -29,23 +31,37 @@ class TableView extends View
         }
     }
 
+    //Hämtar vald tid för ett bord från url:en
+    public function getBookTime() {
+        if(isset($_GET[self::$bookTimeParam])) {
+            $time = $_GET[self::$bookTimeParam];
+            return $time;
+        } else {
+            exit;
+        }
+    }
+
     //Visar lediga bord för den valda dagen och tiden
-    public function showTableTimes($tableTimes, $day) {
-        $link = "<a href='index.php?movies'>Tillbaka</a>";
-        if(empty($tableTimes)) {
-            $ret = $link . "<p>Inga lediga bord finns</p>";
+    public function showTables($tables) {
+        if(empty($tables)) {
+            $ret = $this->backLink . "<p>Inga lediga bord finns</p>";
         }else {
             $header = "<h1>Följande tider hittades</h1><ul>";
             $list = '';
-            foreach ($tableTimes as $time) {
-                $list .= "<li>Det finns ett ledigt bord <b>kl " . $time . "</b>
-                    <a href='?" . self::$bookDayParam . "=" . $day . "&" . self::$bookTimeParam
-                    . "=" . $time . "'>Boka detta bord</a></li>";
+            foreach ($tables as $table) {
+                $list .= "<li>Det finns ett ledigt bord <b>kl " . $table->getTime() . "</b>
+                    <a href='?" . self::$bookTimeParam . "=" . $table->getValue() .
+                    "'>Boka detta bord</a></li>";
             }
             $ul = "</ul>";
-            $ret = $link . $header . $list . $ul;
+            $ret = $this->backLink . $header . $list . $ul;
         }
         return $ret;
+    }
+
+    //Visas när ett bord har bokats
+    public function showResponse($data) {
+        return $this->backlink . "<p>" . $data . "</p>";
     }
 
 }
