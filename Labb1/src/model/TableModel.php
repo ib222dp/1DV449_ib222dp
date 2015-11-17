@@ -36,7 +36,7 @@ class TableModel extends Model
         foreach($section as $input) {
             $startTime = substr($input->getAttribute("value"), 3, -2);
             if((int)$startTime >= (int)$earliestTime) {
-                $endTime = (int)$startTime + 2;
+                $endTime = substr($input->getAttribute("value"), -2);
                 $tableTime = $startTime . "-" . $endTime;
                 $table = new Table($tableTime, $input->getAttribute("value"));
                 array_push($tables, $table);

@@ -20,9 +20,14 @@ class DAO {
     public function getDataAndURL($url) {
         $ch = $this->startCURL($url);
         $data = curl_exec($ch);
-        $redirectURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        curl_close($ch);
-        return array($data, $redirectURL);
+        if($data == false) {
+            curl_close($ch);
+            die("<a href='index.php'>Tillbaka</a><p>Något gick fel.</p>");
+        } else {
+            $redirectURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+            curl_close($ch);
+            return array($data, $redirectURL);
+        }
     }
 
     //Postar formulärdata och returnerar svaret
@@ -31,8 +36,13 @@ class DAO {
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
         $data = curl_exec($ch);
-        curl_close($ch);
-        return $data;
+        if($data == false) {
+            curl_close($ch);
+            die("<a href='index.php'>Tillbaka</a><p>Något gick fel.</p>");
+        } else {
+            curl_close($ch);
+            return $data;
+        }
     }
 
 }

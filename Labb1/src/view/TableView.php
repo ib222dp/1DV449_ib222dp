@@ -61,7 +61,7 @@ class TableView extends View
 
     //Visas när ett bord har bokats
     public function showResponse($data) {
-        return $this->backlink . "<p>" . $data . "</p>";
+        return $this->backLink . "<p>" . $data . "</p>";
     }
 
 }

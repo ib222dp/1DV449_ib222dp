@@ -79,7 +79,7 @@ abstract class Model
                 $xpath = new DOMXPath($dom);
                 return $xpath;
             } else {
-                die("Något gick fel.");
+                die("<a href='index.php'>Tillbaka</a><p>Något gick fel.</p>");
             }
         }
     }
