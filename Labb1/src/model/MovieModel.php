@@ -66,15 +66,15 @@ class MovieModel extends Model
         $movieDays = array();
         if(in_array($fri, $availArray)) {
             if($count[$fri] == 3){
-                array_push($movieDays, "Fredag");
+                array_push($movieDays, self::$day1);
             }
         } if(in_array($sat, $availArray)) {
             if($count[$sat] == 3) {
-                array_push($movieDays, "Lördag");
+                array_push($movieDays, self::$day2);
             }
         } if(in_array($sun, $availArray)) {
             if($count[$sun] == 3) {
-                array_push($movieDays, "Söndag");
+                array_push($movieDays, self::$day3);
             }
         }
         return $movieDays;
@@ -89,7 +89,7 @@ class MovieModel extends Model
         $movies = array();
         foreach($movieDays as $movieDay) {
             foreach ($dayOptions as $dayOption) {
-                if (strcasecmp($dayOption->nodeValue, $movieDay) == 0) {
+                if (strcasecmp($dayOption->getAttribute("value"), $movieDay) == 0) {
                     foreach ($movieOptions as $movieOption) {
                         $jsonURL = $cinemaURL . "check?day=" . $dayOption->getAttribute("value") .
                             "&movie=" . $movieOption->getAttribute("value");
@@ -99,9 +99,15 @@ class MovieModel extends Model
                             if ($movie->status == 1) {
                                 //Byter ut movie->movie från ett nummer till namnet på filmen
                                 if (strcasecmp($movieOption->getAttribute("value"), $movie->movie) == 0) {
-                                    $movie->movie = $movieOption->nodeValue;
+                                    $movie->movie = utf8_decode($movieOption->nodeValue);
                                 }
-                                $movie->day = $movieDay;
+                                if($movieDay == self::$day1) {
+                                    $movie->day = "fredag";
+                                } elseif($movieDay == self::$day2) {
+                                    $movie->day = "lördag";
+                                } else {
+                                    $movie->day = "söndag";
+                                }
                                 array_push($movies, $movie);
                             }
                         }

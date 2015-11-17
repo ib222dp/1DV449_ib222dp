@@ -5,6 +5,9 @@ require_once("DAO.php");
 abstract class Model
 {
     private $dao;
+    protected static $day1 = "01";
+    protected static $day2 = "02";
+    protected static $day3 = "03";
 
     //Konstruktor
     public function __construct() {

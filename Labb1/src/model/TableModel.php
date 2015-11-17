@@ -23,9 +23,9 @@ class TableModel extends Model
     public function getTables($day, $time){
         $xpath = $this->getDinnerXPath();
         //Hämtar de bord som är lediga den valda dagen
-        if(strcasecmp($day, "Fredag") == 0) {
+        if(strcasecmp($day, "fredag") == 0) {
             $section = $xpath->query("//div[@class = 'WordSection2']//p//input");
-        } elseif(strcasecmp($day, "Lördag" == 0)) {
+        } elseif(strcasecmp($day, "lördag" == 0)) {
             $section =  $xpath->query("//div[@class = 'WordSection4']//p//input");
         } else {
             $section =  $xpath->query("//div[@class = 'WordSection6']//p//input");

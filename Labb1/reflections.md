@@ -51,10 +51,9 @@ ok har skrivits med stora eller små bokstäver eller både och.
 
 Cinema
 
-Här räknar jag med att alternativen i den översta listrutan är fredag, lördag och söndag, men det spelar ingen roll om
-dagarna skrivits med stora eller små bokstäver eller både och. Jag räknar också med att filmerna hämtas genom ett 
-AJAX-anrop där värdena för dag och film anges som parametrar, och att en films value-attribut samt dess egenskap movie 
-motsvarar varandra.
+Här räknar jag med att värdena för alternativen i den översta listrutan är 01, 02 och 03, och motsvarar fredag, lördag 
+och söndag. Jag räknar också med att filmerna hämtas genom ett AJAX-anrop där värdena för dag och film anges som 
+parametrar, och att en films value-attribut samt dess egenskap movie motsvarar varandra.
 
 Dinner
 
