@@ -1,6 +1,6 @@
 Reflektionsfrågor
 
-1. Etiska aspekter vid webbskrapning
+Etiska aspekter vid webbskrapning
 
 Man kan t.ex. skrapa information och presentera den på ett sätt som kränker den personliga integriteten. 
 Ett svenskt exempel är Lexbase, en webbplats där allmänheten kan söka efter personer och företag som har 
@@ -13,7 +13,7 @@ I USA finns en s.k. "mug shot publishing industry", där webbplatsägare publice
 brottsbekämpande organs databaser och sedan tar ut en avgift för att ta bort någons foto från sajten, oavsett om 
 personen visade sig vara skyldig eller inte (https://en.wikipedia.org/wiki/Mug_shot_publishing_industry).
 
-2. Riktlinjer för utvecklare att tänka på om man vill vara "en god skrapare" mot serverägarna
+Riktlinjer för utvecklare att tänka på om man vill vara "en god skrapare" mot serverägarna
 
 Ta ansvar och vidta åtgärder om din webbskrapa orsakar problem.
 Testa lokalt.
@@ -23,10 +23,10 @@ Respektera robots.txt samt eventuella andra anvisningar om att inte skrapa en we
 Inkludera aktuell kontaktinformation (t.ex. en epost-adress) i "user agent"-fältet i request headern.  
 (https://www.cs.washington.edu/lab/webcrawler-policy)
 Man bör också studera de användarvillkor som publicerats på den webbplats man vill skrapa. I ett rättsfall 2010 mellan 
-Ryanair Ltd och Billigfluege.de GmbH beslutade Irlands högsta domstol att Ryanairs klick-avtal är juridiskt bindande
+Ryanair Ltd och Billigfluege.de GmbH beslutade en irländsk domstol att Ryanairs klick-avtal är juridiskt bindande
 (https://en.wikipedia.org/wiki/Web_scraping).
 
-3. Begränsningar i min lösning - Generellt/Inte generellt
+Begränsningar i min lösning - Generellt/Inte generellt
 
 Länk till startsidan
 
@@ -64,7 +64,7 @@ en bokning finns som karaktärer i detta attribut. URL:en som formuläret ska po
 formulärets action-attribut till startsidans url. Användarnamn och lösenord är hårdkodade men övriga namn och värden 
 som ska skickas med vid en bokning hämtas ut från formuläret.
 
-4. Robots.txt
+Robots.txt
 
 Robots.txt-protokoll är ett sätt att be sökspindlar och andra robotar att inte besöka vissa delar av en webbplats. Rent 
 praktiskt tillämpas metoden i form av en fil, "robots.txt", som placeras i webbplatsens rotkatalog (/). I filen anges 
