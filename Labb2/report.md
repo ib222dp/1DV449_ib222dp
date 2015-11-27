@@ -9,7 +9,7 @@ Ingela Bladh (ib222dp)
 Injektion innebär att opålitlig data skickas till en programtolk som en del av ett kommando eller en fråga. Denna 
 opålitliga data kan lura programtolken till att utföra kommandon eller ge åtkomst till data utan auktorisering [1, s. 6]. 
 Jag kunde i denna applikation logga in genom att ange Bob' OR '1'='1 som lösenord, eftersom sökfrågan blir
-SELECT * FROM user WHERE ... password = 'Bob' OR '1'='1';  
+SELECT * FROM user WHERE ... password = 'Bob' OR '1'='1'.  
 Injektion undviks genom att använda parametriserade sökfrågor, eftersom dessa förhindrar förvirring rörande specialtecken 
 som '. Till exempel skulle databasen i detta fall sökas igenom för att hitta ett lösenord som innehåller ' OR '1='1 [2]. 
 Validering av indata och vitlistning av tecken rekommenderas också, men är inte ett fullständigt skydd eftersom många 
@@ -21,7 +21,7 @@ Funktioner som har med autentisering och sessionshantering att göra implementer
 sätt kan angripare komma över lösenord, nycklar eller sessionstokens, eller utnyttja andra brister i implementationen
 för att anta andra användares identiteter [1, s. 6]. I denna applikation förstörs inte sessionen vid utloggning. Detta
 betyder att om en användare loggar in på applikationen på en publik dator och sedan loggar ut, så kan en annan användare
-komma in på den tidigare användarens konto genom att trycka på bakåt-knappen eller skriva in <.../message> i 
+komma in på den tidigare användarens konto genom att trycka på bakåt-knappen eller skriva in `.../message` i 
 webbläsarens adressfält. I detta fall bör man se till att sessionen förstörs vid utloggning, och att sessionen 
 förstörs automatiskt efter en viss tid (eftersom användare kan använda applikationen på en publik dator och sedan stänga 
 webbläsaren utan att logga ut) [1, s. 8].
@@ -67,7 +67,7 @@ försvåra "brute force"-attacker kan man hasha lösenordet flera gånger [3].
 Utöver åtkomstkontroller på klienten måste applikationer också utföra åtkomstkontroller på servern varje gång en 
 funktion anropas. Utan dessa kontroller kommer angripare att via egna anrop kunna komma åt funktionalitet utan
 auktorisering [1, s. 6]. I denna applikation kan man komma åt meddelandena utan att logga in, genom att skriva in 
-<.../message/data> i webbläsarens adressfält. Detta kan undvikas till exempel genom att lägga till en åtkomstkontroll 
+`.../message/data` i webbläsarens adressfält. Detta kan undvikas till exempel genom att lägga till en åtkomstkontroll 
 i funktionen "getMessages" i filen "messageModel.js". Det är inte tillräckligt att inte visa länkar eller knappar till 
 skyddade funktioner, utan åtkomstkontroller måste också utföras på servern [1, s. 13].
 
@@ -97,7 +97,7 @@ möjliggöra en rad attacker [1, s. 6]. I denna applikation verkar en gammal ver
 ## Referenser
 
 [1] * OWASP, "OWASP Top 10 - 2013 - The ten most critical web application security risks", *OWASP*, september 2015   
-    * [Online] Tillgänglig: <https://www.owasp.org/index.php/Top10#OWASP_Top_10_for_2013>. [Hämtad: 23 november, 2015].
+    * [Online] Tillgänglig: <https://www.owasp.org/index.php/Top10#OWASP_Top_10_for_2013>. [Hämtad: 23 november, 2015].  
 [2] * M. Coates, "Application Security - Understanding, exploiting and defending against top web vulnerabilities",   
     * *Youtube*, mars 2014 [Online] Tillgänglig: <https://www.youtube.com/watch?v=sY7pUJU8a7U>. [Hämtad: 23 november, 2015].  
 [3] * J. Leitet, "Webbteknik II - HT13 - Webbsäkerhet", *Youtube*, november 2013 [Online]  
