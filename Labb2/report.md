@@ -96,6 +96,8 @@ möjliggöra en rad attacker [1, s. 6]. I denna applikation verkar en gammal ver
 
 ## Referenser
 
+Ref | Källa
+--- | :------:
 [1] | OWASP, "OWASP Top 10 - 2013 - The ten most critical web application security risks", *OWASP*, september 2015   
     | [Online] Tillgänglig: <https://www.owasp.org/index.php/Top10#OWASP_Top_10_for_2013>. [Hämtad: 23 november, 2015].  
 [2] | M. Coates, "Application Security - Understanding, exploiting and defending against top web vulnerabilities",   
