@@ -192,6 +192,7 @@ användarens cache sedan dennes senaste besök.
 CSS-kod och Javascript i externa filer.
 + Hur många sidor på webbplatsen som använder samma CSS-kod och Javascript - ju fler sidor som använder samma kod, desto 
 mer lönar det sig att använda externa filer [6, s. 55-58].  
+
 Eftersom denna applikation troligen kommer att användas flera gånger per dag och besökas med komponenter redan i cachen,
 och eftersom CSS-kodstyckena i filerna "admin.html" och "index.html" är identiska, skulle det löna sig att flytta den 
 koden till en extern CSS-fil.
