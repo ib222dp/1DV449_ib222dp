@@ -130,13 +130,15 @@ inkluderar både Cache-Control-headern med direktivet max-age och Expires-header
 30 dagar från idag bör inkluderas i varje komponent som inte ändras särskilt ofta. Ett HTML-dokument har oftast ingen 
 Expires-header eller Cache-Control-header eftersom det innehåller dynamiskt innehåll som uppdateras vid varje anrop 
 [6, s. 7-8, 22-26].  
+
 I denna applikation skulle koden i filen "express.js" kunna skrivas om så att olika headers används för HTML-dokumenten 
 och för komponenterna.  
+
 För komponenterna skulle direktiven i Cache-Control-headern kunna ändras på följande vis:  
-+Direktiven no-cache, no-store och must-revalidate tas bort, eftersom dessa förhindrar att komponenterna cachas och 
++ Direktiven no-cache, no-store och must-revalidate tas bort, eftersom dessa förhindrar att komponenterna cachas och 
 orsakar onödiga http-anrop
-+Direktivet private ändras till public, så att komponenterna även kan cachas i proxy-cacher
-+Direktivet max-age läggs till, till exempel med värdet 30 dagar i framtiden (vilket uttrycks i sekunder)  
++ Direktivet private ändras till public, så att komponenterna även kan cachas i proxy-cacher
++ Direktivet max-age läggs till, till exempel med värdet 30 dagar i framtiden (vilket uttrycks i sekunder)  
 
 I de lösenordsskyddade HTML-dokumenten skulle en Cache-Control-header med direktiven public och no-cache kunna 
 inkluderas. På detta sätt kan dokumenten cachas i en proxy-cache, men de släpps inte från cachen förrän klientens 
