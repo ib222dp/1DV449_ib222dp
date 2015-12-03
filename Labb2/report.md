@@ -46,9 +46,11 @@ Javascript [4]. Attributet "httpOnly" bör därför ändras från "false" till "
 
 En direkt objektreferens inträffar när en utvecklare exponerar en referens till ett internt implementationsobjekt, som
 till exempel en fil, en katalog eller en databasnyckel. Vid avsaknad av åtkomstkontroll eller annat skydd kan angripare
-manipulera dessa referenser för att få åtkomst till data utan auktorisering [1, s. 6]. I denna applikation exponeras
-varje meddelandes databasnyckel i ett dolt fält i HTML-koden, och eftersom ingen åtkomstkontroll görs i funktionerna
-som har med radering av meddelanden att göra, skulle en användare kunna radera en annan användares meddelanden.  
+manipulera dessa referenser för att få åtkomst till data utan auktorisering [1, s. 6].  
+I denna applikation exponeras en inloggad användares databasnyckel och roll ("admin" eller "user") i konsolfönstret om 
+man skriver `.../test` i adressfältet. Denna funktion bör därför tas bort från filen "index.js". Varje meddelandes 
+databasnyckel exponeras också i ett dolt fält i HTML-koden, och eftersom ingen åtkomstkontroll görs i funktionerna som 
+har med radering av meddelanden att göra, skulle en användare kunna radera en annan användares meddelanden.  
 Man kan undvika osäkra direkta objektreferenser genom att använda indirekta objektreferenser per användare eller per 
 session. Till exempel kan en användare få se en numrerad dropdown-lista med de resurser hen har tillgång till, 
 och applikationen kartlägger sedan vilken databasnyckel som numret framför resursen som användaren har valt matchar. Om 
@@ -71,8 +73,10 @@ Utöver åtkomstkontroller på klienten måste applikationer också utföra åtk
 funktion anropas. Utan dessa kontroller kommer angripare att via egna anrop kunna komma åt funktionalitet utan
 auktorisering [1, s. 6]. I denna applikation kan man komma åt meddelandena utan att logga in, genom att skriva in 
 `.../message/data` i webbläsarens adressfält. Detta kan undvikas till exempel genom att lägga till en åtkomstkontroll 
-i funktionen "getMessages" i filen "messageModel.js". Det är inte tillräckligt att inte visa länkar eller knappar till 
-skyddade funktioner, utan åtkomstkontroller måste också utföras på servern [1, s. 13].
+i funktionen "getMessages" i filen "messageModel.js". Skripten "Message.js" och "MessageBoard.js" och anropet till 
+metoden "getMessages" i "MessageBoard.js" bör endast inkluderas i de lösenordsskyddade sidorna. Det är inte tillräckligt 
+att inte visa länkar eller knappar till skyddade funktioner, utan åtkomstkontroller måste också utföras på servern 
+[1, s. 13].
 
 ### CSRF (cross-site request forgery)
 
@@ -208,7 +212,17 @@ erbjuder [7, 8].
 
 ###Undvik omdirigeringar
 
-
+Omdirigeringar används för att omdirigera användare från en URL till en annan. Det finns olika typer av omdirigeringar, 
+men 301 och 302 är de som används mest. Omdirigeringar används mest för HTML-dokument, men de kan också användas för 
+anrop till komponenter i dokumentet (till exempel bilder). Omdirigeringar kan användas till exempel för att analysera 
+trafik på en webbplats eller för att skapa URL:er som är lättare att komma ihåg, men de gör att sidor laddas långsammare. 
+De försenar leveransen av hela HTML-dokumentet, och eftersom inget innehåll kan renderas och inga komponenter kan laddas 
+ner förrän HTML-dokumentet har laddats blir allting försenat. Därför är det bättre att använda alternativ till 
+omdirigeringar som inte leder till att sidor laddas långsamt [6, s. 76-79].  
+I denna applikation används omdirigeringar vid inloggning, utloggning och när en användare skriver in felaktiga 
+inloggningsuppgifter. Omdirigeringarna vid utloggning och felaktig inloggning är kanske nödvändiga av säkerhetsskäl, men 
+koden i filen "index.js" borde kunna skrivas om så att användaren inte omdirigeras till `.../message` efter en korrekt 
+inloggning.
 
 ## Övergripande reflektioner
 
