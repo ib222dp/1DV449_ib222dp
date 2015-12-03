@@ -190,11 +190,11 @@ Javascript i externa filer, eftersom sådana filer i allmänhet cachas, medan HT
 allmänhet inte cachas. Eftersom CSS och Javascript lyfts ut från HTML-dokumentet blir det mindre och går därför snabbare 
 att läsa in. Om Javascript och CSS bör placeras i externa filer eller inte beror på tre faktorer:  
 + Hur många gånger en sida besöks per användare - ju färre gånger samma användare besöker sidan, desto mer lönar det sig 
-att ha CSS-kod och Javascript direkt i HTML-dokumentet, eftersom komponenterna troligen ändå har rensats från 
-användarens cache sedan dennes senaste besök.
+att ha CSS och Javascript direkt i HTML-dokumentet, eftersom komponenterna troligen ändå har rensats från användarens 
+cache sedan dennes senaste besök.
 + Hur ofta sidor på webbplatsen besöks med komponenter redan i cachen - ju oftare desto mer lönar det sig att ha 
-CSS-kod och Javascript i externa filer.
-+ Hur många sidor på webbplatsen som använder samma CSS-kod och Javascript - ju fler sidor som använder samma kod, desto 
+CSS och Javascript i externa filer.
++ Hur många sidor på webbplatsen som använder samma CSS och Javascript - ju fler sidor som använder samma kod, desto 
 mer lönar det sig att använda externa filer [6, s. 55-58].  
 
 Eftersom denna applikation troligen kommer att användas flera gånger per dag och besökas med komponenter redan i cachen,
@@ -226,7 +226,34 @@ inloggning.
 
 ## Övergripande reflektioner
 
+### Optimering i HTTP/2
 
+De första versionerna av http-protokollet var avsiktligt utformade för att implementation skulle vara så enkelt som 
+möjligt. Detta medförde dock sämre prestanda (till exempel komprimeras inte headers i HTTP/1.x). Allteftersom 
+webbapplikationer har blivit mer komplexa och viktigare i vår vardag, har dessa begränsningar i http-protokollet 
+inneburit en allt större börda för både utvecklare och användare. Målet med HTTP/2 har varit att förbättra 
+http-protokollet så att dessa begränsningar försvinner [11].  
+
+Det är en bra idé att använda följande optimeringstekniker i HTTP/1.x såväl som i HTTP/2:
+
++ Minska antalet DNS-uppslag
++ Återanvänd TCP-anslutningar
++ Använd en CDN-tjänst
++ Använd så få omdirigeringar som möjligt
++ Gör http-anrop mindre (skicka inte med onödig data i headers)
++ Komprimera resurser under transport (Gzip)
++ Cacha resurser på klienten
++ Ta bort onödiga resurser  
+
+En del optimeringstekniker som fungerar bra i HTTP/1.x är dock inte längre nödvändiga i HTTP/2:  
+
++ "Domain sharding" är en teknik som innebär att man placerar sin webbplats på flera olika domäner, för att kunna ladda 
+ner fler filer samtidigt. Detta kan ge goda resultat i HTTP/1.x, men är en onödig åtgärd i HTTP/2. Dessutom påverkas en 
+del nya tekniker i HTTP/2 (till exempel komprimering med HPACK) negativt av "domain sharding".
++ Att konkatenera flera filer kan vara en god idé i HTTP/1.x, eftersom det leder till färre http-anrop. I HTTP/2 är det 
+dock onödigt, eftersom antalet http-anrop inte påverkar prestandan.
++ Som nämnts ovan kan det ibland löna sig att ha CSS och Javascript direkt i HTML-dokumentet i HTTP/1.x. I HTTP/2 är det 
+dock bättre att använda sig av "server push" istället [12].
 
 ## Referenser
 
@@ -242,3 +269,5 @@ Nr  | Referens
 [8] | jQuery, "Download", *jQuery*, 2015 [Online] Tillgänglig: <http://jquery.com/download/>. [Hämtad: 2 december 2015].
 [9] | M. Nottingham, "Caching Tutorial for Web Authors and Webmasters", *mark nottingham*, 2013 [Online] Tillgänglig: <https://www.mnot.net/cache_docs/>. [Hämtad: 2 december 2015].
 [10]| D. Wilson, "compression", *GitHub*, september 2015 [Online] Tillgänglig: <https://github.com/expressjs/compression>. [Hämtad: 2 december 2015].
+[11]| I. Grigorik, "HTTP/2" i *High Performance Browser Networking*. Sebastopol: O´Reilly Media, Inc., 2013. [E-bok] Tillgänglig: O´Reilly Atlas.
+[12]| I. Grigorik, "Yesterday's perf best-practices are today's HTTP/2 anti-patterns - Velocity 2015 (Santa Clara)", *Youtube*, juni 2015 [Online] Tillgänglig: <https://www.youtube.com/watch?v=yURLTwZ3ehk>. [Hämtad: 3 december 2015].
