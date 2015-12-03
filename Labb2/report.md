@@ -74,9 +74,9 @@ funktion anropas. Utan dessa kontroller kommer angripare att via egna anrop kunn
 auktorisering [1, s. 6]. I denna applikation kan man komma åt meddelandena utan att logga in, genom att skriva in 
 `.../message/data` i webbläsarens adressfält. Detta kan undvikas till exempel genom att lägga till en åtkomstkontroll 
 i funktionen "getMessages" i filen "messageModel.js". Skripten "Message.js" och "MessageBoard.js" och anropet till 
-metoden "getMessages" i "MessageBoard.js" bör endast inkluderas i de lösenordsskyddade sidorna. Det är inte tillräckligt 
-att inte visa länkar eller knappar till skyddade funktioner, utan åtkomstkontroller måste också utföras på servern 
-[1, s. 13].
+metoden "getMessages" i "MessageBoard.js" bör endast inkluderas i det lösenordsskyddade dokumentet. Det är inte 
+tillräckligt att inte visa länkar eller knappar till skyddade funktioner, utan åtkomstkontroller måste också utföras på 
+servern [1, s. 13].
 
 ### CSRF (cross-site request forgery)
 
