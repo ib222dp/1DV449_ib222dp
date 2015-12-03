@@ -141,11 +141,11 @@ och för komponenterna.
 För komponenterna skulle direktiven i Cache-Control-headern kunna ändras på följande vis:  
 + Direktiven no-cache, no-store och must-revalidate tas bort, eftersom dessa förhindrar att komponenterna cachas och 
 orsakar onödiga http-anrop
-+ Direktivet private ändras till public, så att komponenterna även kan cachas i proxy-cacher
++ Direktivet private ändras till public, så att komponenterna även kan cachas i en proxy-cache
 + Direktivet max-age läggs till, till exempel med värdet 30 dagar i framtiden (vilket uttrycks i sekunder)  
 
-I de lösenordsskyddade HTML-dokumenten skulle en Cache-Control-header med direktiven public och no-cache kunna 
-inkluderas. På detta sätt kan dokumenten cachas i en proxy-cache, men de släpps inte från cachen förrän klientens 
+I det lösenordsskyddade HTML-dokumentet skulle en Cache-Control-header med direktiven public och no-cache kunna 
+inkluderas. På detta sätt kan dokumentet cachas i en proxy-cache, men det släpps inte från cachen förrän klientens 
 autentiseringsinformation har verifierats på servern.  
 
 Det finns inte några riktlinjer i http-specifikationen för Pragma-headern, och att använda den har oftast ingen effekt. 
