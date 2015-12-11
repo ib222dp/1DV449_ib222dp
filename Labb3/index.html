@@ -1,35 +1,50 @@
 <!DOCTYPE html>
 <html lang="sv">
-<head>
-    <title>Labb 3</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css" />
-    <style type="text/css">
-        html, body { height: 100%; margin: 0; padding: 0; }
-        #map, .row, .col-md-6 { height: 100%; }
-    </style>
-</head>
-<body>
-<div class="row">
-    <div class="col-md-6">
-        <dl id="infoList" class="dl-horizontal">
+    <head>
+        <title>Labb 3</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css" />
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name = "viewport" content = "width = device-width">
+        <style type="text/css">
+            html, body { height: 100%; margin: 0; padding: 0; }
+            #map, .row, .col-sm-6 { height: 100%; }
+        </style>
+    </head>
+    <body>
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="page-header">Trafikmeddelanden</h1>
+                <div class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Välj kategori <b class="caret"></b></a>
+                    <ul class="dropdown-menu" id="dropdown">
+                        <li><a href="#" id="0">Vägtrafik</a></li>
+                        <li><a href="#" id="1">Kollektivtrafik</a></li>
+                        <li><a href="#" id="2">Planerad störning</a></li>
+                        <li><a href="#" id="3">Övrigt</a></li>
+                        <li><a href="#" id="4">Alla kategorier</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <dl id="infoList" class="dl-horizontal">
 
-        </dl>
-    </div>
-    <div class="col-md-6">
-        <div id="map">
+                    </dl>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div id="map">
 
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-<script async defer
-        src="http://maps.googleapis.com/maps/api/js?callback=initMap">
-</script>
-<script src="scripts/jquery-2.1.4.js"></script>
-<script src="scripts/bootstrap.js"></script>
-<script src="scripts/date.format.js"></script>
-<script src="scripts/App.js"></script>
-<script src="scripts/AjaxCon.js"></script>
-</body>
+        <script async defer
+                src="http://maps.googleapis.com/maps/api/js?callback=initMap">
+        </script>
+        <script src="scripts/jquery-2.1.4.js"></script>
+        <script src="scripts/bootstrap.js"></script>
+        <script src="scripts/date.format.js"></script>
+        <script src="scripts/App.js"></script>
+        <script src="scripts/AjaxCon.js"></script>
+    </body>
 </html>
