@@ -1,37 +1,98 @@
 "use strict";
 var App = {
     url: "http://api.sr.se/api/v2/traffic/messages?format=json",
+    fileUrl: "json/SRInfo.json",
     category: 4,
+    dl: document.getElementById("infoList"),
     htmlArray: [],
     messageArray: [],
     markers: [],
 
     init: function () {
-        var messArray = [], fromAPI;
-        if (!jQuery.isEmptyObject(App.htmlArray)) {
-            App.htmlArray.length = 0;
-        }
+        App.resetArrays();
+        App.createDropdownHandlers();
+        App.getTrafficInfo();
+    },
+
+    resetArrays: function () {
+        var i, j;
         if (!jQuery.isEmptyObject(App.messageArray)) {
             App.messageArray.length = 0;
         }
         if (!jQuery.isEmptyObject(App.markers)) {
+            for (i = 0; i < App.markers.length; i += 1) {
+                App.markers[i].setMap(null);
+            }
             App.markers.length = 0;
         }
+        if (!jQuery.isEmptyObject(App.htmlArray)) {
+            for (j = 0; j < App.htmlArray.length; j += 1) {
+                App.dl.removeChild(App.htmlArray[j]);
+            }
+            App.htmlArray.length = 0;
+        }
+    },
+
+    createDropdownHandlers: function () {
+        var i, links = $('#dropdown').find('a');
+        //Gör ett nytt anrop när man klickar på en länk i dropdown-listan
+        var changeCategory = function (link) {
+            App.category = link.id;
+            App.resetArrays();
+            App.getTrafficInfo();
+        };
+        //Skapar eventhandlers för länkarna i dropdown-listan
+        for (i = 0; i < links.length; i += 1) {
+            links[i].onclick = function (e) {
+                e.preventDefault();
+                changeCategory(e.target);
+            }
+        }
+    },
+
+    getTrafficInfo: function () {
         //Hämtar header från json-filen
         //http://osric.com/chris/accidental-developer/2014/08/using-getresponseheader-with-jquerys-ajax-method/
         $.ajax({
             type: 'HEAD',
-            url: 'json/SRInfo.json'
+            url: App.fileUrl
         }).done(function (data, textStatus, xhr) {
             var hdr = xhr.getResponseHeader('last-modified');
             var lastMod = new Date(hdr);
-            console.log(lastMod);
             //Hämtar trafikinfo
             var getInfo = function (url, fromAPI) {
                 new AjaxCon(url, function (data) {
-                    var i, messageObj = JSON.parse(data);
-                    if (typeof messageObj === 'object') {
-                        if (fromAPI === true) {
+                    var messageObj = JSON.parse(data);
+                    //Filtrerar trafikmeddelanden på kategori
+                    var filterMessages = function () {
+                        var i, messArray = [];
+                        for (i = 0; i < messageObj.messages.length; i += 1) {
+                            var message = messageObj.messages[i];
+                            messArray.push(message);
+                        }
+                        if (parseInt(App.category) === 4) {
+                            App.messageArray = messArray;
+                        } else {
+                            App.messageArray = $.grep(messArray, function (obj) {
+                                return obj.category === parseInt(App.category);
+                            });
+                        }
+                    };
+                    //Skapar karta och/eller lista
+                    var createComponents = function () {
+                        if (jQuery.isEmptyObject(App.messageArray)) {
+                            App.createNoMessList();
+                        } else {
+                            App.createMapAndList();
+                        }
+                    };
+                    //Väljer aktion beroende på om datat läses in från fil eller API:et, och beroende på om
+                    // anropet till API:et lyckades
+                    if (fromAPI === false) {
+                        filterMessages();
+                        createComponents();
+                    } else {
+                        if (typeof messageObj === 'object') {
                             //Skriver nytt data till json-filen
                             //http://stackoverflow.com/questions/8599595/send-json-data-from-javascript-to-php
                             $.ajax({
@@ -40,44 +101,42 @@ var App = {
                                 data: { json: data },
                                 dataType: 'json'
                             });
-                        }
-                        for (i = 0; i < messageObj.messages.length; i += 1) {
-                            var message = messageObj.messages[i];
-                            messArray.push(message);
-                        }
-                        //Filtrerar trafikmeddelanden på kategori
-                        if (parseInt(App.category) === 4) {
-                            App.messageArray = messArray;
+                            filterMessages();
+                            createComponents();
                         } else {
-                            App.messageArray = $.grep(messArray, function (obj) {
-                                return obj.category === parseInt(App.category);
-                            });
+                            getInfo(App.fileUrl, false);
                         }
-                        App.initMap();
                     }
                 });
             };
             //Anropar getInfo() med url till API:et eller json-filen beroende på om filen är äldre än 5 minuter
             //http://stackoverflow.com/questions/15272761/javascript-time-passed-since-timestamp
-            if (Math.floor((new Date() - lastMod) / 60000) > 5) {
-                fromAPI = true;
-                getInfo(App.url, fromAPI);
+            if (Math.floor((new Date() - lastMod) / 60000) < 5) {
+                getInfo(App.fileUrl, false);
             } else {
-                fromAPI = false;
-                getInfo('json/SRInfo.json', fromAPI);
+                getInfo(App.url, true);
             }
         });
     },
 
-    initMap: function () {
-        var prevInfowindow = false, dl = document.getElementById("infoList");
+    createNoMessList: function () {
+        var i, noMessagesT = document.createElement("dt");
+        noMessagesT.innerHTML = "Inga meddelanden";
+        App.htmlArray.push(noMessagesT);
+        for (i = 0; i < App.htmlArray.length; i += 1) {
+            App.dl.appendChild(App.htmlArray[i]);
+        }
+    },
+
+    createMapAndList: function () {
+        var prevInfowindow = false;
         //Initialiserar kartan
         var map = new google.maps.Map(document.getElementById('map'), {
             center: { lat: 62.334225, lng: 15.023907 },
             zoom: 5
         });
+        //Formaterar datum, kategori och prioritet
         var formatandSortArray = function () {
-            //Formaterar datum, kategori och prioritet
             var i;
             for (i = 0; i < App.messageArray.length; i += 1) {
                 App.messageArray[i].createddate = new Date(parseInt(App.messageArray[i].createddate.substring(6, 19)));
@@ -163,7 +222,6 @@ var App = {
             markers[0].setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function () { markers[0].setAnimation(null); }, 2000);
         };
-        //Skapar lista med trafikmeddelanden
         var createList = function () {
             var i, j;
             for (i = 0; i < App.messageArray.length; i += 1) {
@@ -183,36 +241,13 @@ var App = {
                 App.htmlArray.push(titleT, titleD, dateT, dateD);
             }
             for (j = 0; j < App.htmlArray.length; j += 1) {
-                dl.appendChild(App.htmlArray[j]);
-            }
-        };
-        //Gör ett nytt anrop när man klickar på en länk i dropdown-listan
-        var changeCategory = function (link) {
-            var i, j;
-            for (i = 0; i < App.markers.length; i += 1) {
-                App.markers[i].setMap(null);
-            }
-            for (j = 0; j < App.htmlArray.length; j += 1) {
-                dl.removeChild(App.htmlArray[j]);
-            }
-            App.category = link.id;
-            App.init();
-        };
-        //Skapar eventhandlers för länkarna i dropdown-listan
-        var addListEventHandlers = function () {
-            var i, links = $('#dropdown').find('a');
-            for (i = 0; i < links.length; i += 1) {
-                links[i].onclick = function (e) {
-                    e.preventDefault();
-                    changeCategory(e.target);
-                }
+                App.dl.appendChild(App.htmlArray[j]);
             }
         };
         //Anropar funktioner
         formatandSortArray();
         createMarkers();
         createList();
-        addListEventHandlers();
     }
 };
 window.onload = App.init;
