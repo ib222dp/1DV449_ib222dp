@@ -34,7 +34,7 @@ var App = {
     },
 
     createDropdownHandlers: function () {
-        var i, links = $('#dropdown').find('a');
+        var i, links = jQuery('#dropdown').find('a');
         //Gör ett nytt anrop när man klickar på en länk i dropdown-listan
         var changeCategory = function (link) {
             App.category = link.id;
@@ -46,14 +46,14 @@ var App = {
             links[i].onclick = function (e) {
                 e.preventDefault();
                 changeCategory(e.target);
-            }
+            };
         }
     },
 
     getTrafficInfo: function () {
         //Hämtar header från json-filen
         //http://osric.com/chris/accidental-developer/2014/08/using-getresponseheader-with-jquerys-ajax-method/
-        $.ajax({
+        jQuery.ajax({
             type: 'HEAD',
             url: App.fileUrl
         }).done(function (data, textStatus, xhr) {
@@ -73,7 +73,7 @@ var App = {
                         if (parseInt(App.category) === 4) {
                             App.messageArray = messArray;
                         } else {
-                            App.messageArray = $.grep(messArray, function (obj) {
+                            App.messageArray = jQuery.grep(messArray, function (obj) {
                                 return obj.category === parseInt(App.category);
                             });
                         }
@@ -95,14 +95,14 @@ var App = {
                         if (typeof messageObj === 'object') {
                             //Skriver nytt data till json-filen
                             //http://stackoverflow.com/questions/8599595/send-json-data-from-javascript-to-php
-                            $.ajax({
+                            jQuery.ajax({
                                 type: 'POST',
                                 url: 'scripts/caching.php',
                                 data: { json: data },
                                 dataType: 'json'
                             });
-                            filterMessages();
-                            createComponents();
+                            //Läser in filen efter att nytt data skrivits till den
+                            getInfo(App.fileUrl, false);
                         } else {
                             getInfo(App.fileUrl, false);
                         }
@@ -120,12 +120,10 @@ var App = {
     },
 
     createNoMessList: function () {
-        var i, noMessagesT = document.createElement("dt");
+        var noMessagesT = document.createElement("dt");
         noMessagesT.innerHTML = "Inga meddelanden";
         App.htmlArray.push(noMessagesT);
-        for (i = 0; i < App.htmlArray.length; i += 1) {
-            App.dl.appendChild(App.htmlArray[i]);
-        }
+        App.dl.appendChild(noMessagesT);
     },
 
     createMapAndList: function () {
@@ -218,7 +216,9 @@ var App = {
         };
         //Får markören att hoppa när man klickar på en länk i listan
         var markerBounce = function (aTag) {
-            var markers = $.grep(App.markers, function (obj) { return obj.title === aTag.innerHTML });
+            var markers = jQuery.grep(App.markers, function (obj) {
+                return obj.title === aTag.innerHTML;
+            });
             markers[0].setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function () { markers[0].setAnimation(null); }, 2000);
         };

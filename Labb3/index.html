@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <title>Labb 3</title>
+    <title>Labb 3 - Trafikmeddelanden</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width = device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <style type="text/css">
         html, body {
             height: 100%;
@@ -14,53 +14,62 @@
             padding: 0;
         }
 
-        #map, .row, .col-sm-6 {
+        #map, .container, .row, .col-sm-6 {
             height: 100%;
         }
     </style>
 </head>
 <body>
-<div class="row">
-    <div class="col-sm-6">
-        <div class="dropdown">
-            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Välj kategori <b class="caret"></b></a>
-            <ul class="dropdown-menu" id="dropdown">
-                <li><a href="#" id="0">Vägtrafik</a></li>
-                <li><a href="#" id="1">Kollektivtrafik</a></li>
-                <li><a href="#" id="2">Planerad störning</a></li>
-                <li><a href="#" id="3">Övrigt</a></li>
-                <li><a href="#" id="4">Alla kategorier</a></li>
-            </ul>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="dropdown">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Välj kategori <b class="caret"></b></a>
+                <ul class="dropdown-menu" id="dropdown">
+                    <li><a href="#" id="0">Vägtrafik</a></li>
+                    <li><a href="#" id="1">Kollektivtrafik</a></li>
+                    <li><a href="#" id="2">Planerad störning</a></li>
+                    <li><a href="#" id="3">Övrigt</a></li>
+                    <li><a href="#" id="4">Alla kategorier</a></li>
+                </ul>
+            </div>
+            <h1 class="page-header">Trafikmeddelanden</h1>
+            <div class="bg-info">
+                <div class="row">&nbsp;</div>
+                <div class="row">
+                    <div class="col-sm-11 col-sm-offset-1">
+                        <p class="text-justify">
+                            Meddelandena hämtas från
+                            <a href="http://sverigesradio.se/api/documentation/v2/index.html">Sveriges Radios öppna API</a>
+                        </p>
+                        <p class="text-justify">
+                            <strong>Markörer:</strong>
+                            Blå = Mycket allvarlig händelse, Lila = Stor händelse,<br />
+                            Röd = Störning, Gul = Information, Grön = Mindre störning
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="row">&nbsp;</div>
+                <dl id="infoList" class="dl-horizontal"></dl>
+            </div>
         </div>
-        <h1 class="page-header">Trafikmeddelanden</h1>
-        <div class="bg-info">
-            <p>
-                Meddelandena hämtas från
-                <a href="http://sverigesradio.se/api/documentation/v2/index.html">Sveriges Radios öppna API</a>
-            </p>
-            <p>
-                <strong>Markörer:</strong>
-                Blå = Mycket allvarlig händelse, Lila = Stor händelse, Röd = Störning, Gul = Information,
-                <br />Grön = Mindre störning
-            </p>
-        </div>
-        <div>
-            <dl id="infoList" class="dl-horizontal"></dl>
-        </div>
-    </div>
-    <div class="col-sm-6">
-        <div id="map">
+        <div class="col-sm-6">
+            <div id="map">
 
+            </div>
         </div>
     </div>
 </div>
 <script async defer
         src="http://maps.googleapis.com/maps/api/js?callback=initMap">
 </script>
-<script src="scripts/jquery-2.1.4.js"></script>
-<script src="scripts/bootstrap.js"></script>
-<script src="scripts/date.format.js"></script>
-<script src="scripts/App.js"></script>
-<script src="scripts/AjaxCon.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script src="scripts/date.format.min.js"></script>
+<script src="scripts/App.min.js"></script>
+<script src="scripts/AjaxCon.min.js"></script>
 </body>
 </html>
