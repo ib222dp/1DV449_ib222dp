@@ -1,7 +1,7 @@
 "use strict";
 var App = {
     url: "http://api.sr.se/api/v2/traffic/messages?format=json",
-    fileUrl: "json/SRInfo.json",
+    fileUrl: "data/SRInfo.json",
     category: 4,
     dl: document.getElementById("infoList"),
     htmlArray: [],
@@ -97,7 +97,7 @@ var App = {
                             //http://stackoverflow.com/questions/8599595/send-json-data-from-javascript-to-php
                             jQuery.ajax({
                                 type: 'POST',
-                                url: 'scripts/caching.php',
+                                url: 'data/caching.php',
                                 data: { json: data },
                                 dataType: 'json'
                             });

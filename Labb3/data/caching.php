@@ -6,7 +6,7 @@ if (isset($_POST['json']) && !empty($_POST['json']) && !is_null($_POST['json']))
     if (is_object(json_decode($_POST['json']))) {
         //Filtrerar data innan det skrivs till filen (https://www.html5andbeyond.com/jquery-ajax-json-php/)
         $messages = htmlspecialchars($_POST['json'], ENT_NOQUOTES);
-        $url = '../json/SRInfo.json';
+        $url = '../data/SRInfo.json';
         $file = file_get_contents($url);
         $data = json_decode($file);
         unset($data);
