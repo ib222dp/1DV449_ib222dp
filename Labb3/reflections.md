@@ -30,7 +30,7 @@ reservplan om Google Maps skulle sluta fungera.
 
 ## Optimering
 
-Jag har min Javascript-kod och CSS-kod i externa filer, och  jag har minifierat mina Javasscript-filer med [Packer]
+Jag har min Javascript-kod och CSS-kod i externa filer, och  jag har minifierat mina Javascript-filer med [Packer]
 (http://dean.edwards.name/packer/). Jag använder CDN-tjänster för Bootstrap och Jquery. För att se om JSON-filen är mer 
 än 5 minuter gammal läser jag endast in "head". Jag har aktiverat [komprimering med Gzip på servern]
 (http://salscode.com/tutorials/2009/10/15/gzip-htaccess/), och placerat CSS-filer längst upp och Javascript-filer längst 
