@@ -6,7 +6,6 @@ class SearchController {
     private $model;
     private $view;
 
-    //Konstruktor
     public function __construct() {
         $this->model = new SearchModel();
         $this->view = new SearchView($this->model);
@@ -20,15 +19,21 @@ class SearchController {
             $author = $this->view->getAuthor();
             $year = $this->view->getYear();
             $language = $this->view->getLanguage();
-            $BHLUrl = $this->model->getUrl($title, $author, $year, $language, false);
-            $newLang = $this->model->changeLangValue($language);
-            $GAUrl = $this->model->getUrl($title, $author, $year, $newLang, true);
-            $GAResults = $this->model->getAPIResults($GAUrl, true);
-            $BHLResults = $this->model->getAPIResults($BHLUrl, false);
-            $ret = $this->view->showResults($GAResults, $BHLResults);
+            if($this->model->inputEmpty($title, $author)){
+                $ret = array($this->view->showEmptyValPage(), true);
+            } else {
+                $BHLUrl = $this->model->getUrl($title, $author, $year, $language, false);
+                $newLang = $this->model->changeLangValue($language);
+                $GAUrl = $this->model->getUrl($title, $author, $year, $newLang, true);
+                $GAResults = $this->model->getAPIResults($GAUrl, true);
+                $BHLResults = $this->model->getAPIResults($BHLUrl, false);
+                $BHLBooks = $this->model->createBHLBooks($BHLResults);
+                $GABooks = $this->model->createGABooks($GAResults);
+                $ret = array($this->view->showResults($GABooks, $BHLBooks), false);
+            }
         } else {
             $this->model->destroySession();
-            $ret = $this->view->showSearchForm();
+            $ret = array($this->view->showSearchForm(), true);
         }
         return $ret;
     }

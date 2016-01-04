@@ -3,6 +3,9 @@
 require_once("DAL.php");
 require_once("GAUrl.php");
 require_once("BHLUrl.php");
+require_once("BHLBook.php");
+require_once("BHLAuthor.php");
+require_once("GABook.php");
 
 class SearchModel
 {
@@ -10,15 +13,12 @@ class SearchModel
     private $GAUrl;
     private $BHLUrl;
 
-
-    //Konstruktor
     public function __construct() {
         $this->dal = new DAL();
         $this->GAUrl = new GAUrl();
         $this->BHLUrl = new BHLUrl();
     }
 
-    //Förstör sessionen
     public function destroySession() {
         $_SESSION = array();
         if (ini_get("session.use_cookies")) {
@@ -46,10 +46,67 @@ class SearchModel
         return $items;
     }
 
+    public function cmp($a, $b) {
+        return strcmp($a->getTitle(), $b->getTitle());
+    }
+
+    public function createBHLBooks($items) {
+        $books = array();
+        if(!empty($items)) {
+            foreach($items as $item) {
+                $book = new BHLBook($item->TitleUrl, $item->Items[0]->ItemUrl, $item->FullTitle, $item->Edition, $item->PublisherPlace,
+                    $item->PublisherName, $item->PublicationDate, $item->Items[0]->Contributor);
+                foreach($item->Authors as $auth) {
+                    $author = new BHLAuthor($auth->Name, $auth->Role);
+                    $book->addAuthor($author);
+                }
+                array_push($books, $book);
+            }
+
+            foreach($books as $b) {
+                $mainAuth;
+                $newArray = array();
+                foreach($b->getAuthors() as $auth) {
+                    if(substr($auth->getRole(), 0, 4) === 'Main') {
+                        $mainAuth = $auth;
+                    } else {
+                        array_push($newArray, $auth);
+                    }
+                }
+                array_unshift($newArray, $mainAuth);
+                $b->deleteAuthors();
+                foreach($newArray as $author) {
+                    $b->addAuthor($author);
+                }
+            }
+            //http://stackoverflow.com/questions/4282413/sort-array-of-objects-by-object-fields
+            usort($books, array($this, "cmp"));
+        }
+        return $books;
+    }
+
+    public function inputEmpty($title, $author) {
+        if(empty($title) && empty($author)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function createGABooks($items) {
+        $books = array();
+        if(!empty($items)) {
+            foreach($items as $item) {
+                $book = new GABook($item->guid, $item->edmIsShownAt[0], $item->title[0], $item->year[0], $item->dcCreator[0]);
+                array_push($books, $book);
+            }
+            usort($books, array($this, "cmp"));
+        }
+        return $books;
+    }
+
     //http://stackoverflow.com/questions/11330480/strip-php-variable-replace-white-spaces-with-dashes
     public function trimParam($param) {
-        $param = ltrim($param);
-        $param = rtrim($param);
         $param = preg_replace("/[\s-]+/", " ", $param);
         $param = preg_replace("/[\s_]/", "+", $param);
         return $param;
@@ -75,92 +132,65 @@ class SearchModel
     }
 
     public function getUrl($title, $author, $year, $language, $isGA) {
-        $trTitle = '';
-        $trAuthor = '';
-        if(!empty($title) && empty($author)) {
+        if(!empty($title)) {
             $trTitle = $this->trimParam($title);
-            if(!empty($year) && $language !== "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getYear() . $year . $this->GAUrl->getLang() . $language . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getYear() . $year . $this->BHLUrl->getLang() . $language . $this->BHLUrl->getEnd();
-                }
-            } elseif(empty($year) && $language === "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getEnd();
-                }
-            } elseif(empty($year) && $language !== "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getLang() . $language . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getLang() . $language . $this->BHLUrl->getEnd();
-                }
-            } elseif(!empty($year) && $language === "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getYear() . $year . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getYear() . $year . $this->BHLUrl->getEnd();
-                }
-            }
-        } elseif(empty($title) && !empty($author)) {
+        }
+        if(!empty($author)) {
             $trAuthor = $this->trimParam($author);
-            if(!empty($year) && $language !== "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getAuthQuery() . $trAuthor . $this->GAUrl->getYear() . $year . $this->GAUrl->getLang() . $language . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getYear() . $year . $this->BHLUrl->getLang() . $language . $this->BHLUrl->getEnd();
-                }
-            } elseif(empty($year) && $language === "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getAuthQuery() . $trAuthor . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getEnd();
-                }
-            } elseif(empty($year) && $language !== "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getAuthQuery() . $trAuthor . $this->GAUrl->getLang() . $language . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getLang() . $language . $this->BHLUrl->getEnd();
-                }
-            } elseif(!empty($year) && $language === "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getAuthQuery() . $trAuthor . $this->GAUrl->getYear() . $year . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getYear() . $year . $this->BHLUrl->getEnd();
-                }
-            }
-        } elseif(!empty($title) && !empty($author)) {
-            $trTitle = $this->trimParam($title);
-            $trAuthor = $this->trimParam($author);
-            if(!empty($year) && $language !== "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getAuthQF() . $trAuthor . $this->GAUrl->getYear() . $year . $this->GAUrl->getLang() . $language . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getYear() . $year . $this->BHLUrl->getLang() . $language . $this->BHLUrl->getEnd();
-                }
-            } elseif(empty($year) && $language === "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getAuthQF() . $trAuthor . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getEnd();
-                }
-            } elseif(empty($year) && $language !== "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getAuthQF() . $trAuthor . $this->GAUrl->getLang() . $language . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getLang() . $language . $this->BHLUrl->getEnd();
-                }
-            } elseif(!empty($year) && $language === "NONE") {
-                if($isGA) {
-                    $url = $this->GAUrl->getStart() . $this->GAUrl->getQuery() . $trTitle . $this->GAUrl->getAuthQF() . $trAuthor . $this->GAUrl->getYear() . $year . $this->GAUrl->getEnd();
-                } else {
-                    $url = $this->BHLUrl->getStart() . $this->BHLUrl->getTitle() . $trTitle . $this->BHLUrl->getAuth() . $trAuthor . $this->BHLUrl->getYear() . $year . $this->BHLUrl->getEnd();
-                }
-            }
         }
 
+        if($isGA) {
+            $start = $this->GAUrl->getStart();
+            $titleQuery = $this->GAUrl->getQuery() . $trTitle;
+            if(!empty($title) && !empty($author)) {
+                $authQuery = $this->GAUrl->getAuthQF() . $trAuthor;
+            } else {
+                $authQuery = $this->GAUrl->getAuthQuery() . $trAuthor;
+            }
+            $yearQuery =  $this->GAUrl->getYear() . $year;
+            $langQuery = $this->GAUrl->getLang() . $language;
+            $end = $this->GAUrl->getEnd();
+        } else {
+            $start = $this->BHLUrl->getStart();
+            $titleQuery = $this->BHLUrl->getTitle() . $trTitle;
+            $authQuery = $this->BHLUrl->getAuth() . $trAuthor;
+            $yearQuery = $this->BHLUrl->getYear() . $year;
+            $langQuery = $this->BHLUrl->getLang() . $language;
+            $end = $this->BHLUrl->getEnd();
+        }
+
+        if(!empty($title) && empty($author)) {
+            if(!empty($year) && $language !== "NONE") {
+                $middle = $titleQuery . $yearQuery . $langQuery;
+            } elseif(empty($year) && $language === "NONE") {
+                $middle = $titleQuery;
+            } elseif(empty($year) && $language !== "NONE") {
+                $middle = $titleQuery . $langQuery;
+            } elseif(!empty($year) && $language === "NONE") {
+                $middle = $titleQuery . $yearQuery;
+            }
+        } elseif(empty($title) && !empty($author)) {
+            if(!empty($year) && $language !== "NONE") {
+                $middle = $authQuery . $yearQuery . $langQuery;
+            } elseif(empty($year) && $language === "NONE") {
+                $middle = $authQuery;
+            } elseif(empty($year) && $language !== "NONE") {
+                $middle = $authQuery . $langQuery;
+            } elseif(!empty($year) && $language === "NONE") {
+                $middle = $authQuery . $yearQuery;
+            }
+        } elseif(!empty($title) && !empty($author)) {
+            if(!empty($year) && $language !== "NONE") {
+                $middle = $titleQuery . $authQuery . $yearQuery . $langQuery;
+            } elseif(empty($year) && $language === "NONE") {
+                $middle = $titleQuery . $authQuery;
+            } elseif(empty($year) && $language !== "NONE") {
+                $middle = $titleQuery . $authQuery . $langQuery;
+            } elseif(!empty($year) && $language === "NONE") {
+                $middle = $titleQuery . $authQuery . $yearQuery;
+            }
+        }
+        $url = $start . $middle . $end;
         return $url;
     }
 
