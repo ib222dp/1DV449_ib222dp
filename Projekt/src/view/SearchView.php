@@ -18,7 +18,7 @@ class SearchView
         $this->yearField = "year";
         $this->langField = "lang";
         //http://stackoverflow.com/questions/10794362/trying-to-build-a-toggle-button-that-will-show-and-hide-a-div-box-using-bootstra
-        $this->searchForm = '            <div class="row">
+        $this->searchForm = '<div class="row">
                                 <div class="col-md-12">
                                     <div class="well">
                                         <form class="form-horizontal" action="index.php" method="post">
@@ -51,6 +51,7 @@ class SearchView
                                                         <div class="col-md-10">
 							                                <select class="form-control" name="' . $this->langField . '">
                                                                 <option value="NONE">-- Select a language --</option>
+                                                                <option value="CHI">Chinese</option>
                                                                 <option value="DUT">Dutch</option>
                                                                 <option value="ENG">English</option>
                                                                 <option value="FRE">French</option>
@@ -120,8 +121,8 @@ class SearchView
         }
     }
 
-    public function showEmptyValPage() {
-        return '<p>You have to provide at least a title or an author</p>' . $this->searchForm;
+    public function showEmptyValPage($message) {
+        return '<ul class="list-group"><li class="list-group-item list-group-item-danger">' . $message . '</li></ul>' . $this->searchForm;
     }
 
     public function showResults($GABooks, $BHLBooks) {
@@ -156,7 +157,6 @@ class SearchView
                         $gList .= $title . $url . $ul;
                     }
                 }
-
             }
         }
 
@@ -177,7 +177,6 @@ class SearchView
         }
         return '<div class="row"><div class="col-md-6"><h4>Results from Gallica</h4>' . $gList . '</div><div class="col-md-6"><h4>Results from BHL</h4>' . $bList . '</div></div></div>';
     }
-
 
     public function showSearchForm() {
         return $this->searchForm;

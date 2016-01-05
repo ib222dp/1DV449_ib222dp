@@ -29,80 +29,59 @@ class SearchModel
         session_destroy();
     }
 
-    public function getFileResults($fileUrl) {
-        $fileContents = file_get_contents($fileUrl);
-        $results = json_decode($fileContents);
-        return $results;
+    public function setErrorMessage($message) {
+        $_SESSION['errormsg'] = $message;
     }
 
-    public function getAPIResults($url, $isGA) {
-        $data = $this->dal->getData($url);
-        $results = json_decode($data);
-        if($isGA) {
-            $items = $results->items;
-        } else {
-            $items = $results->Result;
-        }
-        return $items;
-    }
-
-    public function cmp($a, $b) {
-        return strcmp($a->getTitle(), $b->getTitle());
-    }
-
-    public function createBHLBooks($items) {
-        $books = array();
-        if(!empty($items)) {
-            foreach($items as $item) {
-                $book = new BHLBook($item->TitleUrl, $item->Items[0]->ItemUrl, $item->FullTitle, $item->Edition, $item->PublisherPlace,
-                    $item->PublisherName, $item->PublicationDate, $item->Items[0]->Contributor);
-                foreach($item->Authors as $auth) {
-                    $author = new BHLAuthor($auth->Name, $auth->Role);
-                    $book->addAuthor($author);
-                }
-                array_push($books, $book);
-            }
-
-            foreach($books as $b) {
-                $mainAuth;
-                $newArray = array();
-                foreach($b->getAuthors() as $auth) {
-                    if(substr($auth->getRole(), 0, 4) === 'Main') {
-                        $mainAuth = $auth;
-                    } else {
-                        array_push($newArray, $auth);
-                    }
-                }
-                array_unshift($newArray, $mainAuth);
-                $b->deleteAuthors();
-                foreach($newArray as $author) {
-                    $b->addAuthor($author);
-                }
-            }
-            //http://stackoverflow.com/questions/4282413/sort-array-of-objects-by-object-fields
-            usort($books, array($this, "cmp"));
-        }
-        return $books;
+    public function getErrorMessage() {
+        return $_SESSION['errormsg'];
     }
 
     public function inputEmpty($title, $author) {
         if(empty($title) && empty($author)) {
+            $this->setErrorMessage('You have to provide at least a title or an author');
             return true;
         } else {
             return false;
         }
     }
 
-    public function createGABooks($items) {
-        $books = array();
-        if(!empty($items)) {
-            foreach($items as $item) {
-                $book = new GABook($item->guid, $item->edmIsShownAt[0], $item->title[0], $item->year[0], $item->dcCreator[0]);
-                array_push($books, $book);
+    public function yearOk($year) {
+        if(strlen($year) === 4 || empty($year)) {
+            if(is_numeric(substr($year, 0, 4)) || empty($year)) {
+                return true;
+            } else {
+                $this->setErrorMessage('Provide year in format YYYY');
+                return false;
             }
-            usort($books, array($this, "cmp"));
+        } else {
+            $this->setErrorMessage('Provide year in format YYYY');
+            return false;
         }
-        return $books;
+    }
+
+    public function searchTermInDB($title, $author, $year, $language) {
+        $result = $this->dal->searchTermInDB($title, $author, $year, $language);
+        if($result !== null) {
+            if(($result->saved_date - time()) <= 300) {
+                return true;
+            } else {
+                //delete results
+                //update $result->saved_date
+                return false;
+            }
+        } else {
+            //$this->dal->saveSearchTerm($title, $author, $year, $language);
+            return false;
+        }
+    }
+
+    public function getDBBHLResults($title, $author, $year, $language) {
+
+    }
+
+    public function getDBGAResults($title, $author, $year, $language) {
+
     }
 
     //http://stackoverflow.com/questions/11330480/strip-php-variable-replace-white-spaces-with-dashes
@@ -110,25 +89,6 @@ class SearchModel
         $param = preg_replace("/[\s-]+/", " ", $param);
         $param = preg_replace("/[\s_]/", "+", $param);
         return $param;
-    }
-
-    public function changeLangValue($language) {
-        if($language === "DUT") {
-            $language = "nl";
-        } elseif($language === "ENG") {
-            $language = "en";
-        } elseif($language === "FRE") {
-            $language = "fr";
-        } elseif($language === "GER") {
-            $language = "de";
-        } elseif($language === "ITA") {
-            $language = "it";
-        } elseif($language === "RUS") {
-            $language = "ru";
-        } elseif($language === "SPA") {
-            $language = "es";
-        }
-        return $language;
     }
 
     public function getUrl($title, $author, $year, $language, $isGA) {
@@ -159,39 +119,134 @@ class SearchModel
             $end = $this->BHLUrl->getEnd();
         }
 
+        $none = "NONE";
+
         if(!empty($title) && empty($author)) {
-            if(!empty($year) && $language !== "NONE") {
+            if(!empty($year) && $language !== $none) {
                 $middle = $titleQuery . $yearQuery . $langQuery;
-            } elseif(empty($year) && $language === "NONE") {
+            } elseif(empty($year) && $language === $none) {
                 $middle = $titleQuery;
-            } elseif(empty($year) && $language !== "NONE") {
+            } elseif(empty($year) && $language !== $none) {
                 $middle = $titleQuery . $langQuery;
-            } elseif(!empty($year) && $language === "NONE") {
+            } elseif(!empty($year) && $language === $none) {
                 $middle = $titleQuery . $yearQuery;
             }
         } elseif(empty($title) && !empty($author)) {
-            if(!empty($year) && $language !== "NONE") {
+            if(!empty($year) && $language !== $none) {
                 $middle = $authQuery . $yearQuery . $langQuery;
-            } elseif(empty($year) && $language === "NONE") {
+            } elseif(empty($year) && $language === $none) {
                 $middle = $authQuery;
-            } elseif(empty($year) && $language !== "NONE") {
+            } elseif(empty($year) && $language !== $none) {
                 $middle = $authQuery . $langQuery;
-            } elseif(!empty($year) && $language === "NONE") {
+            } elseif(!empty($year) && $language === $none) {
                 $middle = $authQuery . $yearQuery;
             }
         } elseif(!empty($title) && !empty($author)) {
-            if(!empty($year) && $language !== "NONE") {
+            if(!empty($year) && $language !== $none) {
                 $middle = $titleQuery . $authQuery . $yearQuery . $langQuery;
-            } elseif(empty($year) && $language === "NONE") {
+            } elseif(empty($year) && $language === $none) {
                 $middle = $titleQuery . $authQuery;
-            } elseif(empty($year) && $language !== "NONE") {
+            } elseif(empty($year) && $language !== $none) {
                 $middle = $titleQuery . $authQuery . $langQuery;
-            } elseif(!empty($year) && $language === "NONE") {
+            } elseif(!empty($year) && $language === $none) {
                 $middle = $titleQuery . $authQuery . $yearQuery;
             }
         }
         $url = $start . $middle . $end;
         return $url;
+    }
+
+    public function changeLangValue($language) {
+        if($language === "CHI") {
+            $language = "zh";
+        } elseif($language === "DUT") {
+            $language = "nl";
+        } elseif($language === "ENG") {
+            $language = "en";
+        } elseif($language === "FRE") {
+            $language = "fr";
+        } elseif($language === "GER") {
+            $language = "de";
+        } elseif($language === "ITA") {
+            $language = "it";
+        } elseif($language === "RUS") {
+            $language = "ru";
+        } elseif($language === "SPA") {
+            $language = "es";
+        }
+        return $language;
+    }
+
+    public function getFileResults($fileUrl) {
+        $fileContents = file_get_contents($fileUrl);
+        $results = json_decode($fileContents);
+        return $results;
+    }
+
+    public function getAPIResults($url, $isGA) {
+        $data = $this->dal->getData($url);
+        $results = json_decode($data);
+        if($isGA) {
+            $items = $results->items;
+        } else {
+            $items = $results->Result;
+        }
+        return $items;
+    }
+
+    public function cmp($a, $b) {
+        return strcmp($a->getTitle(), $b->getTitle());
+    }
+
+    public function createBHLBooks($items) {
+        $books = array();
+        if(!empty($items)) {
+            foreach($items as $item) {
+                $book = new BHLBook($item->TitleUrl, $item->Items[0]->ItemUrl, $item->FullTitle, $item->Edition, $item->PublisherPlace,
+                    $item->PublisherName, $item->PublicationDate, $item->Items[0]->Contributor, "ENG");
+                foreach($item->Authors as $auth) {
+                    if(substr($auth->Role, 0, 4) === 'Main') {
+                        $author = new BHLAuthor($auth->Name, $auth->Role);
+                        $book->addAuthor($author);
+                    }
+                }
+                foreach($item->Authors as $auth) {
+                    if(substr($auth->Role, 0, 4) !== 'Main') {
+                        $author = new BHLAuthor($auth->Name, $auth->Role);
+                        $book->addAuthor($author);
+                    }
+                }
+                array_push($books, $book);
+            }
+            //http://stackoverflow.com/questions/4282413/sort-array-of-objects-by-object-fields
+            usort($books, array($this, 'cmp'));
+        }
+        return $books;
+    }
+
+    public function createGABooks($items) {
+        $books = array();
+        if(!empty($items)) {
+            foreach($items as $item) {
+                $book = new GABook($item->guid, $item->edmIsShownAt[0], $item->title[0], $item->year[0], $item->dcCreator[0], $item->dcLanguage[0]);
+                array_push($books, $book);
+            }
+            usort($books, array($this, "cmp"));
+        }
+        return $books;
+    }
+
+    public function getSavedBHLBooks() {
+        return $_SESSION['BHLBooks'];
+    }
+
+    public function getSavedGABooks() {
+        return $_SESSION['GABooks'];
+    }
+
+    public function saveResults($BHLBooks, $GABooks) {
+        $_SESSION['BHLBooks'] = $BHLBooks;
+        $_SESSION['GABooks'] = $GABooks;
     }
 
 }

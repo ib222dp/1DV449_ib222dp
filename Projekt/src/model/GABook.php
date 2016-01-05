@@ -7,13 +7,15 @@ class GABook {
     private $title;
     private $year;
     private $author;
+    private $lang;
 
-    public function __construct($titleUrl, $itemUrl, $title, $year, $author) {
+    public function __construct($titleUrl, $itemUrl, $title, $year, $author, $lang) {
         $this->titleUrl = $titleUrl;
         $this->itemUrl = $itemUrl;
         $this->title = $title;
         $this->year = $year;
         $this->author = $author;
+        $this->lang = $lang;
     }
 
     public function getTitleUrl() {
@@ -50,6 +52,10 @@ class GABook {
 
     public function getAuthorListItem() {
         return '<li>By: ' . $this->author . '</li>';
+    }
+
+    public function getLanguage() {
+        return $this->lang;
     }
 
 }

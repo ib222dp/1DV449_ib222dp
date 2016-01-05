@@ -20,20 +20,40 @@ class SearchController {
             $year = $this->view->getYear();
             $language = $this->view->getLanguage();
             if($this->model->inputEmpty($title, $author)){
-                $ret = array($this->view->showEmptyValPage(), true);
+                header('Location: index.php');
             } else {
-                $BHLUrl = $this->model->getUrl($title, $author, $year, $language, false);
-                $newLang = $this->model->changeLangValue($language);
-                $GAUrl = $this->model->getUrl($title, $author, $year, $newLang, true);
-                $GAResults = $this->model->getAPIResults($GAUrl, true);
-                $BHLResults = $this->model->getAPIResults($BHLUrl, false);
-                $BHLBooks = $this->model->createBHLBooks($BHLResults);
-                $GABooks = $this->model->createGABooks($GAResults);
-                $ret = array($this->view->showResults($GABooks, $BHLBooks), false);
+                if($this->model->yearOk($year)) {
+                    if($this->model->searchTermInDB) {
+                        $BHLBooks = $this->model->getDBBHLResults($title, $author, $year, $language);
+                        $GABooks = $this->model->getDBGAResults($title, $author, $year, $language);
+                    } else {
+                        $BHLUrl = $this->model->getUrl($title, $author, $year, $language, false);
+                        $GALang = $this->model->changeLangValue($language);
+                        $GAUrl = $this->model->getUrl($title, $author, $year, $GALang, true);
+                        $BHLResults = $this->model->getAPIResults($BHLUrl, false);
+                        $GAResults = $this->model->getAPIResults($GAUrl, true);
+                        $BHLBooks = $this->model->createBHLBooks($BHLResults);
+                        $GABooks = $this->model->createGABooks($GAResults);
+                        //save to DB, connect to saved searchterm
+                    }
+                    $this->model->saveResults($BHLBooks, $GABooks);
+                }
+                header('Location: index.php');
             }
         } else {
-            $this->model->destroySession();
-            $ret = array($this->view->showSearchForm(), true);
+            $errormsg = $this->model->getErrorMessage();
+            $BHLBooks = $this->model->getSavedBHLBooks();
+            $GABooks = $this->model->getSavedGABooks();
+            if(isset($errormsg) && $errormsg !== 0) {
+                $this->model->destroySession();
+                $ret = array($this->view->showEmptyValPage($errormsg), true);
+            } elseif(isset($BHLBooks) && isset($GABooks)) {
+                $this->model->destroySession();
+                $ret = array($this->view->showResults($GABooks, $BHLBooks), false);
+            }else {
+                $this->model->destroySession();
+                $ret = array($this->view->showSearchForm(), true);
+            }
         }
         return $ret;
     }

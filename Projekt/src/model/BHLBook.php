@@ -10,9 +10,10 @@ class BHLBook {
     private $publisherName;
     private $publicationDate;
     private $contributor;
+    private $lang;
     private $authors;
 
-    public function __construct($titleUrl, $itemUrl, $title, $edition, $publisherPlace, $publisherName, $publicationDate, $contributor) {
+    public function __construct($titleUrl, $itemUrl, $title, $edition, $publisherPlace, $publisherName, $publicationDate, $contributor, $lang) {
         $this->titleUrl = $titleUrl;
         $this->itemUrl = $itemUrl;
         $this->title = $title;
@@ -21,27 +22,12 @@ class BHLBook {
         $this->publisherName = $publisherName;
         $this->publicationDate = $publicationDate;
         $this->contributor = $contributor;
-        $this->authors = array();
-    }
-
-    public function addAuthor($author) {
-        array_push($this->authors, $author);
-    }
-
-    public function deleteAuthors() {
+        $this->lang = $lang;
         $this->authors = array();
     }
 
     public function getTitleUrl() {
         return $this->titleUrl;
-    }
-
-    public function getItemUrl() {
-        return $this->itemUrl;
-    }
-
-    public function getUrlListItem() {
-        return '<li><a href="' . $this->itemUrl . '" target="_blank">View book</a></li>';
     }
 
     public function getTitle() {
@@ -52,8 +38,20 @@ class BHLBook {
         return '<li><a href="' . $this->titleUrl . '" target="_blank">' . $this->title . '</a></li>';
     }
 
+    public function getItemUrl() {
+        return $this->itemUrl;
+    }
+
+    public function getUrlListItem() {
+        return '<li><a href="' . $this->itemUrl . '" target="_blank">View book</a></li>';
+    }
+
     public function getAuthors() {
         return $this->authors;
+    }
+
+    public function addAuthor($author) {
+        array_push($this->authors, $author);
     }
 
     public function getAuthorListItem() {
@@ -96,6 +94,10 @@ class BHLBook {
 
     public function getContrListItem() {
         return '<li>Contributed by: ' . $this->contributor . '</li>';
+    }
+
+    public function getLanguage() {
+        return $this->lang;
     }
 
 }
