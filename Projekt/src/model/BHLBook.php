@@ -11,7 +11,8 @@ class BHLBook {
     private $publicationDate;
     private $contributor;
     private $lang;
-    private $authors;
+    private $author;
+    private $coAuthors;
 
     public function __construct($titleUrl, $itemUrl, $title, $edition, $publisherPlace, $publisherName, $publicationDate, $contributor, $lang) {
         $this->titleUrl = $titleUrl;
@@ -23,7 +24,7 @@ class BHLBook {
         $this->publicationDate = $publicationDate;
         $this->contributor = $contributor;
         $this->lang = $lang;
-        $this->authors = array();
+        $this->coAuthors = array();
     }
 
     public function getTitleUrl() {
@@ -44,24 +45,6 @@ class BHLBook {
 
     public function getUrlListItem() {
         return '<li><a href="' . $this->itemUrl . '" target="_blank">View book</a></li>';
-    }
-
-    public function getAuthors() {
-        return $this->authors;
-    }
-
-    public function addAuthor($author) {
-        array_push($this->authors, $author);
-    }
-
-    public function getAuthorListItem() {
-        $list ='';
-        foreach($this->authors as $author) {
-            $list .= $author->getName() . ' - ';
-        }
-        $list = rtrim($list, ' - ');
-        $list = rtrim($list, ',');
-        return '<li>By: ' . $list . '</li>';
     }
 
     public function getEdition() {
@@ -98,6 +81,34 @@ class BHLBook {
 
     public function getLanguage() {
         return $this->lang;
+    }
+
+    public function getAuthor() {
+        return $this->author;
+    }
+
+    public function setAuthor($author) {
+        $this->author = $author;
+    }
+
+    public function getCoAuthors() {
+        return $this->coAuthors;
+    }
+
+    public function addCoAuthor($author) {
+        array_push($this->coAuthors, $author);
+    }
+
+    public function getAuthorListItem() {
+        if($this->author !== null) {
+            $list = $this->author->getName();
+        }
+        foreach($this->coAuthors as $author) {
+            $list .= $author->getName() . ' - ';
+        }
+        $list = rtrim($list, ' - ');
+        $list = rtrim($list, ',');
+        return '<li>By: ' . $list . '</li>';
     }
 
 }

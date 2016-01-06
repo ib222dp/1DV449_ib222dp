@@ -11,6 +11,22 @@ class SearchController {
         $this->view = new SearchView($this->model);
     }
 
+    public function getAPIResults($title, $author, $year, $language, $isGA) {
+        if($isGA) {
+            $GALang = $this->model->changeLangValue($language);
+            $url = $this->model->getUrl($title, $author, $year, $GALang, $isGA);
+        } else {
+            $url = $this->model->getUrl($title, $author, $year, $language, $isGA);
+        }
+        $results = $this->model->getAPIResults($url, $isGA);
+        if($isGA) {
+            $books = $this->model->createGABooks($results);
+        } else {
+            $books = $this->model->createBHLBooks($results);
+        }
+        return $books;
+    }
+
     public function start() {
         if($this->view->userPressedSubmit()) {
             //$GAResults = $this->model->getFileResults(__DIR__ . '/../model/results.json');
@@ -19,24 +35,29 @@ class SearchController {
             $author = $this->view->getAuthor();
             $year = $this->view->getYear();
             $language = $this->view->getLanguage();
-            if($this->model->inputEmpty($title, $author)){
+            if($this->model->inputEmpty($title, $author)) {
                 header('Location: index.php');
             } else {
                 if($this->model->yearOk($year)) {
-                    if($this->model->searchTermInDB) {
-                        $BHLBooks = $this->model->getDBBHLResults($title, $author, $year, $language);
-                        $GABooks = $this->model->getDBGAResults($title, $author, $year, $language);
+                    if(!empty($title)) {
+                        $titleId = $this->model->searchTermInDB($title);
+                        if($titleId !== null) {
+                            //$BHLBooks = $this->model->getDBBooks($titleId, $author, $year, $language, false);
+                            $GABooks = $this->model->getDBBooks($titleId, $author, $year, $language, true);
+                        } else {
+                            $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
+                            $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
+                            if(empty($author) && empty($year) && $language === "NONE") {
+                                if((!empty($BHLBooks) && !empty($GABooks)) || !empty($BHLBooks) || !empty($GABooks)) {
+                                    $this->model->saveResultsinDB($title, $BHLBooks, $GABooks);
+                                }
+                            }
+                        }
                     } else {
-                        $BHLUrl = $this->model->getUrl($title, $author, $year, $language, false);
-                        $GALang = $this->model->changeLangValue($language);
-                        $GAUrl = $this->model->getUrl($title, $author, $year, $GALang, true);
-                        $BHLResults = $this->model->getAPIResults($BHLUrl, false);
-                        $GAResults = $this->model->getAPIResults($GAUrl, true);
-                        $BHLBooks = $this->model->createBHLBooks($BHLResults);
-                        $GABooks = $this->model->createGABooks($GAResults);
-                        //save to DB, connect to saved searchterm
+                        $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
+                        $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
                     }
-                    $this->model->saveResults($BHLBooks, $GABooks);
+                    $this->model->saveResultsinSession($BHLBooks, $GABooks);
                 }
                 header('Location: index.php');
             }

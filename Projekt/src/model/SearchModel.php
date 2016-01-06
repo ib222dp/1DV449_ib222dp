@@ -6,6 +6,7 @@ require_once("BHLUrl.php");
 require_once("BHLBook.php");
 require_once("BHLAuthor.php");
 require_once("GABook.php");
+require_once("GAAuthor.php");
 
 class SearchModel
 {
@@ -29,12 +30,12 @@ class SearchModel
         session_destroy();
     }
 
-    public function setErrorMessage($message) {
-        $_SESSION['errormsg'] = $message;
-    }
-
     public function getErrorMessage() {
         return $_SESSION['errormsg'];
+    }
+
+    public function setErrorMessage($message) {
+        $_SESSION['errormsg'] = $message;
     }
 
     public function inputEmpty($title, $author) {
@@ -60,28 +61,55 @@ class SearchModel
         }
     }
 
-    public function searchTermInDB($title, $author, $year, $language) {
-        $result = $this->dal->searchTermInDB($title, $author, $year, $language);
+    public function searchTermInDB($title) {
+        $result = $this->dal->searchTermInDB($title);
         if($result !== null) {
-            if(($result->saved_date - time()) <= 300) {
-                return true;
-            } else {
-                //delete results
-                //update $result->saved_date
-                return false;
-            }
+            //if(($result->saved_date - time()) <= 300) {
+            return $result->Id;
+            //} else {
+            //  $this->dal->deleteSearchTerm($result->Id);
+            //return null;
+            //}
         } else {
-            //$this->dal->saveSearchTerm($title, $author, $year, $language);
-            return false;
+            return null;
         }
     }
 
-    public function getDBBHLResults($title, $author, $year, $language) {
-
+    public function changeLangValue($language) {
+        if($language === "CHI") {
+            $language = "zh";
+        } elseif($language === "DUT") {
+            $language = "nl";
+        } elseif($language === "ENG") {
+            $language = "en";
+        } elseif($language === "FRE") {
+            $language = "fr";
+        } elseif($language === "GER") {
+            $language = "de";
+        } elseif($language === "ITA") {
+            $language = "it";
+        } elseif($language === "RUS") {
+            $language = "ru";
+        } elseif($language === "SPA") {
+            $language = "es";
+        }
+        return $language;
     }
 
-    public function getDBGAResults($title, $author, $year, $language) {
+    public function createGABooksFromDB($books) {
+        var_dump($books);
+        die();
+    }
 
+    public function getDBBooks($titleId, $author, $year, $language, $isGA) {
+        if($isGA) {
+            $GALang = $this->changeLangValue($language);
+            $results = $this->dal->getDBGABooks($titleId, $author, $year, $GALang);
+            $books = $this->createGABooksFromDB($results);
+        } else {
+            $results = $this->dal->getDBBHLBooks($titleId, $author, $year, $language);
+        }
+        return $books;
     }
 
     //http://stackoverflow.com/questions/11330480/strip-php-variable-replace-white-spaces-with-dashes
@@ -156,27 +184,6 @@ class SearchModel
         return $url;
     }
 
-    public function changeLangValue($language) {
-        if($language === "CHI") {
-            $language = "zh";
-        } elseif($language === "DUT") {
-            $language = "nl";
-        } elseif($language === "ENG") {
-            $language = "en";
-        } elseif($language === "FRE") {
-            $language = "fr";
-        } elseif($language === "GER") {
-            $language = "de";
-        } elseif($language === "ITA") {
-            $language = "it";
-        } elseif($language === "RUS") {
-            $language = "ru";
-        } elseif($language === "SPA") {
-            $language = "es";
-        }
-        return $language;
-    }
-
     public function getFileResults($fileUrl) {
         $fileContents = file_get_contents($fileUrl);
         $results = json_decode($fileContents);
@@ -204,16 +211,20 @@ class SearchModel
             foreach($items as $item) {
                 $book = new BHLBook($item->TitleUrl, $item->Items[0]->ItemUrl, $item->FullTitle, $item->Edition, $item->PublisherPlace,
                     $item->PublisherName, $item->PublicationDate, $item->Items[0]->Contributor, "ENG");
+                $i = 0;
                 foreach($item->Authors as $auth) {
                     if(substr($auth->Role, 0, 4) === 'Main') {
-                        $author = new BHLAuthor($auth->Name, $auth->Role);
-                        $book->addAuthor($author);
+                        if($i == 0) {
+                            $book->setAuthor(new BHLAuthor($auth->Name, $auth->Role));
+                        } else {
+                            $book->addCoAuthor(new BHLAuthor($auth->Name, $auth->Role));
+                        }
                     }
+                    $i++;
                 }
                 foreach($item->Authors as $auth) {
                     if(substr($auth->Role, 0, 4) !== 'Main') {
-                        $author = new BHLAuthor($auth->Name, $auth->Role);
-                        $book->addAuthor($author);
+                        $book->addCoAuthor(new BHLAuthor($auth->Name, $auth->Role));
                     }
                 }
                 array_push($books, $book);
@@ -228,12 +239,25 @@ class SearchModel
         $books = array();
         if(!empty($items)) {
             foreach($items as $item) {
-                $book = new GABook($item->guid, $item->edmIsShownAt[0], $item->title[0], $item->year[0], $item->dcCreator[0], $item->dcLanguage[0]);
+                $book = new GABook($item->guid, $item->edmIsShownAt[0], $item->title[0], $item->year[0], $item->dcLanguage[0]);
+                $i = 0;
+                foreach($item->dcCreator as $auth) {
+                    if($i == 0) {
+                        $book->setAuthor(new GAAuthor($auth));
+                    } else {
+                        $book->addCoAuthor(new GAAuthor($auth));
+                    }
+                    $i++;
+                }
                 array_push($books, $book);
             }
             usort($books, array($this, "cmp"));
         }
         return $books;
+    }
+
+    public function saveResultsinDB($title, $BHLBooks, $GABooks) {
+
     }
 
     public function getSavedBHLBooks() {
@@ -244,7 +268,7 @@ class SearchModel
         return $_SESSION['GABooks'];
     }
 
-    public function saveResults($BHLBooks, $GABooks) {
+    public function saveResultsinSession($BHLBooks, $GABooks) {
         $_SESSION['BHLBooks'] = $BHLBooks;
         $_SESSION['GABooks'] = $GABooks;
     }
