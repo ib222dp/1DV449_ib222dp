@@ -1,20 +1,20 @@
 <?php
 
-class BHLBook {
+class BHLBook extends Book {
 
-    private $titleUrl;
-    private $itemUrl;
-    private $title;
+    protected $titleUrl;
+    protected $itemUrl;
+    protected $title;
     private $edition;
     private $publisherPlace;
     private $publisherName;
     private $publicationDate;
-    private $contributor;
-    private $lang;
-    private $author;
-    private $coAuthors;
+    private $provider;
+    protected $lang;
+    protected $author;
+    protected $coAuthors;
 
-    public function __construct($titleUrl, $itemUrl, $title, $edition, $publisherPlace, $publisherName, $publicationDate, $contributor, $lang) {
+    public function __construct($titleUrl, $itemUrl, $title, $edition, $publisherPlace, $publisherName, $publicationDate, $provider, $lang) {
         $this->titleUrl = $titleUrl;
         $this->itemUrl = $itemUrl;
         $this->title = $title;
@@ -22,29 +22,9 @@ class BHLBook {
         $this->publisherPlace = $publisherPlace;
         $this->publisherName = $publisherName;
         $this->publicationDate = $publicationDate;
-        $this->contributor = $contributor;
+        $this->provider = $provider;
         $this->lang = $lang;
         $this->coAuthors = array();
-    }
-
-    public function getTitleUrl() {
-        return $this->titleUrl;
-    }
-
-    public function getTitle() {
-        return $this->title;
-    }
-
-    public function getTitleListItem() {
-        return '<li><a href="' . $this->titleUrl . '" target="_blank">' . $this->title . '</a></li>';
-    }
-
-    public function getItemUrl() {
-        return $this->itemUrl;
-    }
-
-    public function getUrlListItem() {
-        return '<li><a href="' . $this->itemUrl . '" target="_blank">View book</a></li>';
     }
 
     public function getEdition() {
@@ -71,40 +51,22 @@ class BHLBook {
         return '<li>Publication info: ' . $this->publisherPlace . ' ' . $this->publisherName . ' ' . $this->publicationDate . '</li>';
     }
 
-    public function getContributor() {
-        return $this->contributor;
+    public function getProvider() {
+        return $this->provider;
     }
 
-    public function getContrListItem() {
-        return '<li>Contributed by: ' . $this->contributor . '</li>';
-    }
-
-    public function getLanguage() {
-        return $this->lang;
-    }
-
-    public function getAuthor() {
-        return $this->author;
-    }
-
-    public function setAuthor($author) {
-        $this->author = $author;
-    }
-
-    public function getCoAuthors() {
-        return $this->coAuthors;
-    }
-
-    public function addCoAuthor($author) {
-        array_push($this->coAuthors, $author);
+    public function getProvListItem() {
+        return '<li>Provided by: ' . $this->provider . '</li>';
     }
 
     public function getAuthorListItem() {
         if($this->author !== null) {
-            $list = $this->author->getName();
+            $list = 'Main: ' . $this->author->getName() . ' - ';
         }
         foreach($this->coAuthors as $author) {
-            $list .= $author->getName() . ' - ';
+            if($author !== null) {
+                $list .= 'Co: ' . $author->getName() . ' - ';
+            }
         }
         $list = rtrim($list, ' - ');
         $list = rtrim($list, ',');

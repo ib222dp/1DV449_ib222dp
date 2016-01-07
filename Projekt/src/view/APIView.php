@@ -1,6 +1,6 @@
 <?php
 
-class SearchView
+class APIView
 {
     private $model;
     private $button;
@@ -10,7 +10,7 @@ class SearchView
     private $langField;
     private $searchForm;
 
-    public function __construct(SearchModel $model) {
+    public function __construct(APIModel $model) {
         $this->model = $model;
         $this->button = "submitButton";
         $this->titleField = "title";

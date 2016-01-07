@@ -1,31 +1,31 @@
 <?php
-require_once("src/model/SearchModel.php");
-require_once("src/view/SearchView.php");
+require_once("src/model/BBOModel.php");
+require_once("src/model/APIModel.php");
+require_once("src/view/APIView.php");
+require_once("DBController.php");
 
 class SearchController {
     private $model;
     private $view;
+    private $DBController;
 
     public function __construct() {
-        $this->model = new SearchModel();
-        $this->view = new SearchView($this->model);
+        $this->model = new APIModel();
+        $this->view = new APIView($this->model);
+        $this->DBController = new DBController();
     }
 
     public function getAPIResults($title, $author, $year, $language, $isGA) {
         if($isGA) {
-            $results = $this->model->getFileResults(__DIR__ . '/../model/results.json');
+            $items = $this->model->getFileResults(__DIR__ . '/../model/results.json');
             //$GALang = $this->model->changeLangValue($language);
             //$url = $this->model->getUrl($title, $author, $year, $GALang, $isGA);
         } else {
-            $results = $this->model->getFileResults( __DIR__ . '/../model/bhlresults.json');
+            $items = $this->model->getFileResults( __DIR__ . '/../model/bhlresults.json');
             //$url = $this->model->getUrl($title, $author, $year, $language, $isGA);
         }
-        //$results = $this->model->getAPIResults($url, $isGA);
-        if($isGA) {
-            $books = $this->model->createGABooks($results);
-        } else {
-            $books = $this->model->createBHLBooks($results);
-        }
+        //$items = $this->model->getAPIResults($url, $isGA);
+        $books = $this->model->createBooks($items, $isGA);
         return $books;
     }
 
@@ -40,18 +40,19 @@ class SearchController {
             } else {
                 if($this->model->yearOk($year)) {
                     if(!empty($title)) {
-                        $titleId = $this->model->searchTermInDB($title);
+                        $titleId = $this->DBController->getSearchTerm($title);
                         if($titleId !== null) {
-                            $BHLBooks = $this->model->getDBBooks($titleId, $author, $year, $language, false);
-                            $GABooks = $this->model->getDBBooks($titleId, $author, $year, $language, true);
+                            $books = $this->DBController->getBooks($titleId, $author, $year, $language);
+                            $BHLBooks = $books[0];
+                            $GABooks = $books[1];
                         } else {
                             $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
                             $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
-                            if(empty($author) && empty($year) && $language === "NONE") {
+                            /*if(empty($author) && empty($year) && $language === "NONE") {
                                 if((!empty($BHLBooks) && !empty($GABooks)) || !empty($BHLBooks) || !empty($GABooks)) {
-                                    $this->model->saveResultsinDB($title, $BHLBooks, $GABooks);
+                                    $this->DBController->saveResults($title, $BHLBooks, $GABooks);
                                 }
-                            }
+                            }*/
                         }
                     } else {
                         $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
