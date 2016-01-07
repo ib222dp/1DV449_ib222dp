@@ -68,14 +68,21 @@ class GABook {
     }
 
     public function getAuthorListItem() {
-        if($this->author !== null) {
-            $list = $this->author->getName();
+        if(substr($this->author->getName(), 0, 6) === "Contr:") {
+            $auth = str_replace(substr($this->author->getName(), 0, 6), "", $this->author->getName());
+            $list = 'Contributor: ' . $auth . ' -- ';
+        } else {
+            $list = 'By: ' . $this->author->getName() . ' -- ';
         }
+
         foreach($this->coAuthors as $author) {
-            $list .= $author->getName() . ' - ';
+            if(substr($author->getName(), 0, 6) === "Contr:") {
+                $auth = str_replace(substr($author->getName(), 0, 6), "", $author->getName());
+            }
+            $list .= $author->getName() . ' -- ';
         }
         $list = rtrim($list, ' - ');
-        return '<li>By: ' . $list . '</li>';
+        return '<li>' . $list . '</li>';
     }
 
 }

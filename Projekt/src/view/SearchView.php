@@ -136,7 +136,7 @@ class SearchView
                 $year = $GABook->getYearListItem();
                 $url = $GABook->getUrlListItem();
                 $ul = '</ul>';
-                if(!empty($GABook->getAuthor())) {
+                if($GABook->getAuthor()->getName() !== 'No author') {
                     if(empty($GABook->getYear()) && empty($GABook->getItemUrl())) {
                         $gList .= $title . $author . $ul;
                     } elseif(!empty($GABook->getYear()) && !empty($GABook->getItemUrl())) {
@@ -166,7 +166,7 @@ class SearchView
         } else {
             foreach ($BHLBooks as $BHLBook) {
                 $bList1 = '<ul class="list-group list-unstyled">' . $BHLBook->getTitleListItem() . $BHLBook->getAuthorListItem();
-                $bList2 = $BHLBook->getPubListItem() . $BHLBook->getContrListItem() . $BHLBook->getUrlListItem() . '</ul>';
+                $bList2 = $BHLBook->getPubListItem() . $BHLBook->getProvListItem() . $BHLBook->getUrlListItem() . '</ul>';
                 if(!empty($BHLBook->getEdition())) {
                     $bList .= $bList1 . $BHLBook->getEditionListItem() . $bList2;
                 } else {

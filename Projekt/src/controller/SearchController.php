@@ -13,12 +13,14 @@ class SearchController {
 
     public function getAPIResults($title, $author, $year, $language, $isGA) {
         if($isGA) {
-            $GALang = $this->model->changeLangValue($language);
-            $url = $this->model->getUrl($title, $author, $year, $GALang, $isGA);
+            $results = $this->model->getFileResults(__DIR__ . '/../model/results.json');
+            //$GALang = $this->model->changeLangValue($language);
+            //$url = $this->model->getUrl($title, $author, $year, $GALang, $isGA);
         } else {
-            $url = $this->model->getUrl($title, $author, $year, $language, $isGA);
+            $results = $this->model->getFileResults( __DIR__ . '/../model/bhlresults.json');
+            //$url = $this->model->getUrl($title, $author, $year, $language, $isGA);
         }
-        $results = $this->model->getAPIResults($url, $isGA);
+        //$results = $this->model->getAPIResults($url, $isGA);
         if($isGA) {
             $books = $this->model->createGABooks($results);
         } else {
@@ -29,8 +31,6 @@ class SearchController {
 
     public function start() {
         if($this->view->userPressedSubmit()) {
-            //$GAResults = $this->model->getFileResults(__DIR__ . '/../model/results.json');
-            //$BHLResults = $this->model->getFileResults( __DIR__ . '/../model/bhlresults.json');
             $title = $this->view->getTitle();
             $author = $this->view->getAuthor();
             $year = $this->view->getYear();
@@ -42,7 +42,7 @@ class SearchController {
                     if(!empty($title)) {
                         $titleId = $this->model->searchTermInDB($title);
                         if($titleId !== null) {
-                            //$BHLBooks = $this->model->getDBBooks($titleId, $author, $year, $language, false);
+                            $BHLBooks = $this->model->getDBBooks($titleId, $author, $year, $language, false);
                             $GABooks = $this->model->getDBBooks($titleId, $author, $year, $language, true);
                         } else {
                             $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);

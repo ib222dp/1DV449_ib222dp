@@ -108,6 +108,7 @@ class SearchModel
             $books = $this->createGABooksFromDB($results);
         } else {
             $results = $this->dal->getDBBHLBooks($titleId, $author, $year, $language);
+            $books = $this->createBHLBooksFromDB($results);
         }
         return $books;
     }
@@ -240,15 +241,31 @@ class SearchModel
         if(!empty($items)) {
             foreach($items as $item) {
                 $book = new GABook($item->guid, $item->edmIsShownAt[0], $item->title[0], $item->year[0], $item->dcLanguage[0]);
-                $i = 0;
-                foreach($item->dcCreator as $auth) {
-                    if($i == 0) {
-                        $book->setAuthor(new GAAuthor($auth));
-                    } else {
-                        $book->addCoAuthor(new GAAuthor($auth));
+                if( $item->dcCreatorLangAware !== null && $item->dcContributorLangAware !== null ||
+                    $item->dcCreatorLangAware !== null && $item->dcContributorLangAware == null) {
+                    $i = 0;
+                    foreach($item->dcCreatorLangAware->def as $auth) {
+                        if($i == 0) {
+                            $book->setAuthor(new GAAuthor($auth));
+                        } else {
+                            $book->addCoAuthor(new GAAuthor($auth));
+                        }
+                        $i++;
                     }
-                    $i++;
+                } elseif(($item->dcCreatorLangAware == null) && ($item->dcContributorLangAware !== null)) {
+                    $i = 0;
+                    foreach($item->dcContributorLangAware->def as $auth) {
+                        if($i == 0) {
+                            $book->setAuthor(new GAAuthor('Contr: ' . $auth));
+                        } else {
+                            $book->addCoAuthor(new GAAuthor('Contr: ' . $auth));
+                        }
+                        $i++;
+                    }
+                } else {
+                    $book->setAuthor(new GAAuthor('No author'));
                 }
+
                 array_push($books, $book);
             }
             usort($books, array($this, "cmp"));

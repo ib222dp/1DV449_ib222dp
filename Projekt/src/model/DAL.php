@@ -59,38 +59,26 @@ class DAL {
     }
 
     public function getDBGABooks($titleId, $author, $year, $language) {
-        /*if(!empty($author)) {
-            $escAuth = $this->dbc->real_escape_string($author);
-        }
-        if(!empty($year)) {
-            $escYear = $this->dbc->real_escape_string($year);
-        }
-        if(!empty($language)) {
-            $escLang = $this->dbc->real_escape_string($language);
-        }*/
-
-        $query =    'SELECT gb.title_url, gb.item_url, gb.title, gb.pub_year, gma.auth_name, GROUP_CONCAT(gca.auth_name, SEPARATOR "*")
+        $query =    'SELECT gb.Id, gb.title_url, gb.item_url, gb.title, gb.pub_year, gma.auth_name, GROUP_CONCAT(gca.auth_name SEPARATOR "*")
                     FROM gabook AS gb
                     LEFT JOIN ga_mainauthor AS gma ON gb.mainauthor_id = gma.Id
                     LEFT OUTER JOIN gabook_gacoauthor AS gbgca ON gbgca.gabook_FK = gb.Id
                     LEFT OUTER JOIN ga_coauthor AS gca ON gbgca.gacoauthor_FK = gca.Id
                     WHERE gb.titlesearch_id="' . $titleId . '"
-                    GROUP BY ';
-
+                    GROUP BY gbgca.gabook_FK';
 
         if(mysqli_set_charset($this->dbc, 'utf8')) {
             if($result = $this->dbc->query($query)){
                 $books = mysqli_fetch_all($result);
-                var_dump($books);
-                die();
+                return $books;
             } else {
-                echo "wrong";
-                die();
+
             }
-            return $result;
+
         } else {
             exit();
         }
+        return null;
     }
 
 }
