@@ -1,6 +1,6 @@
 <?php
 
-abstract class BBOModel
+abstract class MainModel
 {
 
     public function __construct() {
@@ -67,6 +67,31 @@ abstract class BBOModel
             $language = "es";
         }
         return $language;
+    }
+
+    public function setBookProps($book, $titleUrl, $itemUrl, $title, $year, $language) {
+        $book->setTitleUrl($titleUrl);
+        $book->setItemUrl($itemUrl);
+        $book->setTitle($title);
+        $book->setYear($year);
+        $book->setLanguage($language);
+    }
+
+    public function createGABook($titleUrl, $itemUrl, $title, $year, $language) {
+        $book = new GABook();
+        $this->setBookProps($book, $titleUrl, $itemUrl, $title, $year, $language);
+        return $book;
+    }
+
+    public function createBHLBook($titleUrl, $itemUrl, $title, $edition, $pubPlace,
+        $pubName, $year, $provider, $language) {
+        $book = new BHLBook();
+        $this->setBookProps($book, $titleUrl, $itemUrl, $title, $year, $language);
+        $book->setEdition($edition);
+        $book->setPubPlace($pubPlace);
+        $book->setPubName( $pubName);
+        $book->setProvider($provider);
+        return $book;
     }
 
     public function getSavedBHLBooks() {

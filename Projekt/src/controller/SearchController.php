@@ -1,5 +1,5 @@
 <?php
-require_once("src/model/BBOModel.php");
+require_once("src/model/MainModel.php");
 require_once("src/model/APIModel.php");
 require_once("src/view/APIView.php");
 require_once("DBController.php");
@@ -41,15 +41,26 @@ class SearchController {
                 if($this->model->yearOk($year)) {
                     if(!empty($title)) {
                         $titleId = $this->DBController->getSearchTerm($title);
-                        if($titleId !== null) {
-                            $books = $this->DBController->getBooks($titleId, $author, $year, $language);
-                            $BHLBooks = $books[0];
-                            $GABooks = $books[1];
+                        if(is_array($titleId)) {
+                            if($titleId[1] == true){
+                                $books = $this->DBController->getBooks($titleId[0], $author, $year, $language);
+                                $BHLBooks = $books[0];
+                                $GABooks = $books[1];
+                            } else {
+                                $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
+                                $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
+                                /*if(empty($author) && empty($year) && $language === "NONE" && !empty($BHLBooks) ||
+                                   empty($author) && empty($year) && $language === "NONE" && !empty($GABooks)) {
+                                    $this->DBController->saveNewResults($titleId[0], $BHLBooks, $GABooks);
+                                } else {
+                                    $this->DBController->deleteSearchTerm($titleId[0]);
+                                }*/
+                            }
                         } else {
                             $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
                             $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
                             /*if(empty($author) && empty($year) && $language === "NONE") {
-                                if((!empty($BHLBooks) && !empty($GABooks)) || !empty($BHLBooks) || !empty($GABooks)) {
+                                if(!empty($BHLBooks) || !empty($GABooks)) {
                                     $this->DBController->saveResults($title, $BHLBooks, $GABooks);
                                 }
                             }*/

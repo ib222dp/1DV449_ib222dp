@@ -5,11 +5,11 @@ require_once("GAUrl.php");
 require_once("BHLUrl.php");
 require_once("Book.php");
 require_once("BHLBook.php");
-require_once("BHLAuthor.php");
 require_once("GABook.php");
-require_once("GAAuthor.php");
+require_once("Author.php");
+require_once("Contributor.php");
 
-class APIModel extends BBOModel
+class APIModel extends MainModel
 {
     private $APIDAO;
     private $GAUrl;
@@ -113,59 +113,14 @@ class APIModel extends BBOModel
         if(!empty($items)) {
             foreach($items as $item) {
                 if($isGA) {
-                    $book = new GABook($item->guid, $item->edmIsShownAt[0], $item->title[0], $item->year[0], $item->dcLanguage[0]);
-                    if( $item->dcCreatorLangAware !== null && $item->dcContributorLangAware !== null ||
-                        $item->dcCreatorLangAware !== null && $item->dcContributorLangAware == null) {
-                        $i = 0;
-                        foreach($item->dcCreatorLangAware->def as $auth) {
-                            if($i == 0) {
-                                $book->setAuthor(new GAAuthor($auth));
-                            } else {
-                                $book->addCoAuthor(new GAAuthor($auth));
-                            }
-                            $i++;
-                        }
-                    } elseif(($item->dcCreatorLangAware == null) && ($item->dcContributorLangAware !== null)) {
-                        $i = 0;
-                        foreach($item->dcContributorLangAware->def as $auth) {
-                            if($i == 0) {
-                                $book->setAuthor(new GAAuthor('Contr: ' . $auth));
-                            } else {
-                                $book->addCoAuthor(new GAAuthor('Contr: ' . $auth));
-                            }
-                            $i++;
-                        }
-                    } else {
-                        $book->setAuthor(new GAAuthor('No author'));
-                    }
+                    $book = $this->createGABook($item->guid, $item->edmIsShownAt[0], $item->title[0],
+                        $item->year[0], $item->dcLanguage[0]);
+                    $book->setAuthContr($item->dcCreatorLangAware, $item->dcContributorLangAware);
                 } else {
-                    $book = new BHLBook($item->TitleUrl, $item->Items[0]->ItemUrl, $item->FullTitle, $item->Edition, $item->PublisherPlace,
-                        $item->PublisherName, $item->PublicationDate, $item->Items[0]->Contributor, "ENG");
-                    $authors = array();
-                    foreach($item->Authors as $auth) {
-                        if(substr($auth->Role, 0, 4) === 'Main') {
-                            $mainAuth = new BHLAuthor($auth->Name, $auth->Role);
-                            array_push($authors, $mainAuth);
-                            break;
-                        }
-                    }
-                    foreach($item->Authors as $auth) {
-                        if(substr($auth->Role, 0, 4) === 'Main') {
-                            $coAuth = new BHLAuthor($auth->Name, $auth->Role);
-                            array_push($authors, $coAuth);
-                        }
-                    }
-                    foreach($item->Authors as $auth) {
-                        if(substr($auth->Role, 0, 4) !== 'Main') {
-                            $coAuth = new BHLAuthor($auth->Name, $auth->Role);
-                            array_push($authors, $coAuth);
-                        }
-                    }
-                    $book->setAuthor($authors[0]);
-                    for($i = 1; $i <= count($authors); $i++) {
-                        $book->addCoAuthor($authors[$i]);
-                    }
-
+                    $book = $this->createBHLBook($item->TitleUrl, $item->Items[0]->ItemUrl, $item->FullTitle,
+                        $item->Edition, $item->PublisherPlace, $item->PublisherName,
+                        $item->PublicationDate, $item->Items[0]->Contributor, null);
+                    $book->setAuthors($item->Authors);
                 }
                 array_push($books, $book);
             }

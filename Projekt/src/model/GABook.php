@@ -5,43 +5,78 @@ class GABook extends Book {
     protected $titleUrl;
     protected $itemUrl;
     protected $title;
-    private $year;
+    protected $year;
     protected $lang;
     protected $author;
+    private $contributor;
     protected $coAuthors;
 
-    public function __construct($titleUrl, $itemUrl, $title, $year, $lang) {
-        $this->titleUrl = $titleUrl;
-        $this->itemUrl = $itemUrl;
-        $this->title = $title;
-        $this->year = $year;
-        $this->lang = $lang;
+    public function __construct() {
         $this->coAuthors = array();
     }
 
-    public function getYear() {
-        return $this->year;
+    public function setAuthContr($author, $contributor) {
+        if($author !== null && $author->def !== null && !empty($author->def)) {
+            $i = 0;
+            foreach($author->def as $auth) {
+                if($i == 0) {
+                    $this->setAuthor(new Author($auth));
+                    $this->setContributor(new Contributor('No contributor'));
+                } else {
+                    $this->addCoAuthor(new Author($auth));
+                }
+                $i++;
+            }
+            if(empty($this->coAuthors)) {
+                $this->addCoAuthor('No coauthors');
+            }
+        } elseif(($author === null) && ($contributor !== null && $contributor->def !== null && !empty($contributor->def))) {
+            $i = 0;
+            foreach($contributor->def as $contr) {
+                if($i == 0) {
+                    $this->setContributor(new Contributor($contr));
+                    $this->setAuthor(new Author('No author'));
+                } else {
+                    $this->addCoAuthor(new Author($contr));
+                }
+                $i++;
+            }
+            if(empty($this->coAuthors)) {
+                $this->addCoAuthor('No coauthors');
+            }
+        } else {
+            $this->setAuthor(new Author('No author'));
+            $this->setContributor(new Contributor('No contributor'));
+            $this->addCoAuthor('No coauthors');
+        }
+    }
+
+    public function getContributor() {
+        return $this->contributor;
+    }
+
+    public function setContributor($contributor) {
+        $this->contributor = $contributor;
     }
 
     public function getYearListItem() {
-        return '<li>Year: ' . $this->year . '</li>';
+        if($this->year === "") {
+            return '<li></li>';
+        } else {
+            return '<li>Year: ' . $this->year . '</li>';
+        }
     }
 
     public function getAuthorListItem() {
-        if(substr($this->author->getName(), 0, 6) === "Contr:") {
-            $auth = str_replace(substr($this->author->getName(), 0, 6), "", $this->author->getName());
-            $list = 'Contributor: ' . $auth . ' -- ';
-        } else {
+        if($this->author->getName() !== 'No author') {
             $list = 'By: ' . $this->author->getName() . ' -- ';
+        } elseif($this->contributor->getName() !== 'No contributor') {
+            $list = 'Contributor: ' . $this->contributor->getName() . ' -- ';
         }
-
         foreach($this->coAuthors as $author) {
-            if(substr($author->getName(), 0, 6) === "Contr:") {
-                $auth = str_replace(substr($author->getName(), 0, 6), "", $author->getName());
-            }
             $list .= $author->getName() . ' -- ';
         }
-        $list = rtrim($list, ' - ');
+        $list = rtrim($list, ' -- ');
         return '<li>' . $list . '</li>';
     }
 

@@ -12,7 +12,6 @@ class BHLUrl {
     private $year;
     private $lang;
 
-    //Konstruktor
     public function __construct() {
         $this->BHLKey = new BHLKey();
         $this->start = 'http://www.biodiversitylibrary.org/api2/httpquery.ashx?op=BookSearch';

@@ -1,6 +1,6 @@
 <?php
 
-class GAAuthor {
+class Author {
 
     private $name;
 

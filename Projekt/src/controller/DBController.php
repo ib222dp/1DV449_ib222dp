@@ -1,15 +1,12 @@
 <?php
-require_once("src/model/BBOModel.php");
+require_once("src/model/MainModel.php");
 require_once("src/model/DBModel.php");
-require_once("src/view/DBView.php");
 
 class DBController {
     private $model;
-    private $view;
 
     public function __construct() {
         $this->model = new DBModel();
-        $this->view = new DBView($this->model);
     }
 
     public function getSearchTerm($title) {
@@ -25,6 +22,14 @@ class DBController {
 
     public function saveResults($title, $BHLBooks, $GABooks) {
         $this->model->saveResults($title, $BHLBooks, $GABooks);
+    }
+
+    public function saveNewResults($titleId, $BHLBooks, $GABooks) {
+        $this->model->saveNewResults($titleId, $BHLBooks, $GABooks);
+    }
+
+    public function deleteSearchTerm($titleId) {
+        $this->model->deleteSearchTerm($titleId);
     }
 
 }

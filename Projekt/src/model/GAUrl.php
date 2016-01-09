@@ -17,7 +17,6 @@ class GAUrl {
         $this->EurKey = new EurKey();
         $this->start = 'http://www.europeana.eu/api/v2/search.json?wskey=' . $this->EurKey->getValue();
         $this->end = '&qf=europeana_collectionName:"9200365_Ag_EU_TEL_a0142_Gallica"&qf=TYPE:"TEXT"&profile=minimal';
-        //media=true
         $this->query = '&query=';
         $this->authQuery = '&query=who:';
         $this->authQF = '&qf=who:';

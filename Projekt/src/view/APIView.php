@@ -131,32 +131,9 @@ class APIView
             $gList = '<p>No results found</p>';
         } else {
             foreach ($GABooks as $GABook) {
-                $title = '<ul class="list-group list-unstyled">' . $GABook->getTitleListItem();
-                $author = $GABook->getAuthorListItem();
-                $year = $GABook->getYearListItem();
-                $url = $GABook->getUrlListItem();
-                $ul = '</ul>';
-                if($GABook->getAuthor()->getName() !== 'No author') {
-                    if(empty($GABook->getYear()) && empty($GABook->getItemUrl())) {
-                        $gList .= $title . $author . $ul;
-                    } elseif(!empty($GABook->getYear()) && !empty($GABook->getItemUrl())) {
-                        $gList .= $title . $author . $year . $url . $ul;
-                    } elseif(!empty($GABook->getYear()) && empty($GABook->getItemUrl())) {
-                        $gList .= $title . $author . $year . $ul;
-                    } elseif(empty($GABook->getYear()) && !empty($GABook->getItemUrl())) {
-                        $gList .= $title . $author . $url . $ul;
-                    }
-                } else {
-                    if(empty($GABook->getYear()) && empty($GABook->getItemUrl())) {
-                        $gList .= $title . $ul;
-                    } elseif(!empty($GABook->getYear()) && !empty($GABook->getItemUrl())) {
-                        $gList .= $title . $year . $url . $ul;
-                    } elseif(!empty($GABook->getYear()) && empty($GABook->getItemUrl())) {
-                        $gList .= $title . $year . $ul;
-                    } elseif(empty($GABook->getYear()) && !empty($GABook->getItemUrl())) {
-                        $gList .= $title . $url . $ul;
-                    }
-                }
+                $gList .=    '<ul class="list-group list-unstyled">' . $GABook->getTitleListItem() .
+                    $GABook->getAuthorListItem() . $GABook->getYearListItem() .
+                    $GABook->getUrlListItem() . '</ul>';
             }
         }
 
@@ -165,17 +142,14 @@ class APIView
             $bList = '<p>No results found</p>';
         } else {
             foreach ($BHLBooks as $BHLBook) {
-                $bList1 = '<ul class="list-group list-unstyled">' . $BHLBook->getTitleListItem() . $BHLBook->getAuthorListItem();
-                $bList2 = $BHLBook->getPubListItem() . $BHLBook->getProvListItem() . $BHLBook->getUrlListItem() . '</ul>';
-                if(!empty($BHLBook->getEdition())) {
-                    $bList .= $bList1 . $BHLBook->getEditionListItem() . $bList2;
-                } else {
-                    $bList .= $bList1 . $bList2;
-                }
+                $bList .=   '<ul class="list-group list-unstyled">' . $BHLBook->getTitleListItem() .
+                    $BHLBook->getAuthorListItem() . $BHLBook->getEditionListItem() .
+                    $BHLBook->getPubListItem() . $BHLBook->getProvListItem() . $BHLBook->getUrlListItem() . '</ul>';
             }
 
         }
-        return '<div class="row"><div class="col-md-6"><h4>Results from Gallica</h4>' . $gList . '</div><div class="col-md-6"><h4>Results from BHL</h4>' . $bList . '</div></div></div>';
+        return  '<div class="row"><div class="col-md-6"><h4>Results from Gallica</h4>' . $gList .
+        '</div><div class="col-md-6"><h4>Results from BHL</h4>' . $bList . '</div></div></div>';
     }
 
     public function showSearchForm() {
