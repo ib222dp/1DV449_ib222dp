@@ -34,7 +34,7 @@ class BHLBook extends Book {
         if($this->edition === '') {
             return '<li></li>';
         } else {
-            return '<li>Edition: ' . $this->edition . '</li>';
+            return '<li>Edition: ' . htmlspecialchars($this->edition) . '</li>';
         }
     }
 
@@ -66,7 +66,8 @@ class BHLBook extends Book {
         if($this->pubPlace === '' && $this->pubName === '' && $this->year === '') {
             return '<li></li>';
         } else {
-            return '<li>Publication info: ' . $this->pubPlace . ' ' . $this->pubName . ' ' . $this->year . '</li>';
+            return '<li>Publication info: ' . htmlspecialchars($this->pubPlace) . ' ' .
+            htmlspecialchars($this->pubName) . ' ' . htmlspecialchars($this->year) . '</li>';
         }
     }
 
@@ -86,19 +87,24 @@ class BHLBook extends Book {
         if($this->provider === '') {
             return '<li></li>';
         } else {
-            return '<li>Provided by: ' . $this->provider . '</li>';
+            return '<li>Provided by: ' . htmlspecialchars($this->provider) . '</li>';
         }
     }
 
     public function getAuthorListItem() {
-        if($this->author === 'No author' && empty($this->coAuthors)) {
+        if($this->author->getName() === 'No author' && $this->coAuthors[0]->getName() === 'No coauthors') {
             return '<li></li>';
         } else {
-            if($this->author !== 'No author') {
-                $list = 'Main: ' . $this->author->getName() . ' -- ';
+            if($this->author->getName() !== 'No author') {
+                $list = htmlspecialchars($this->author->getName()) . ' -- ';
             }
+
             foreach($this->coAuthors as $author) {
-                $list .= 'Co: ' . $author->getName() . ' -- ';
+                if($author->getName() === 'No coauthors') {
+                    break;
+                } else {
+                    $list .= htmlspecialchars($author->getName()) . ' -- ';
+                }
             }
             $list = rtrim($list, ' -- ');
             $list = rtrim($list, ',');
@@ -140,15 +146,17 @@ class BHLBook extends Book {
                 }
             }
             if(!empty($temp)) {
-                for($i = 1; $i <= count($temp); $i++) {
+                $arrLength = count($temp);
+                for($i = 0; $i < $arrLength; $i++) {
                     $this->addCoAuthor($temp[$i]);
+
                 }
             } else {
-                $this->addCoAuthor('No coauthors');
+                $this->addCoAuthor(new Author('No coauthors'));
             }
         } else {
             $this->setAuthor(new Author('No author'));
-            $this->addCoAuthor('No coauthors');
+            $this->addCoAuthor(new Author('No coauthors'));
         }
     }
 

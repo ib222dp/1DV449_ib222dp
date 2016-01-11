@@ -17,14 +17,14 @@ class SearchController {
 
     public function getAPIResults($title, $author, $year, $language, $isGA) {
         if($isGA) {
-            $items = $this->model->getFileResults(__DIR__ . '/../model/results.json');
-            //$GALang = $this->model->changeLangValue($language);
-            //$url = $this->model->getUrl($title, $author, $year, $GALang, $isGA);
+            //$items = $this->model->getFileResults(__DIR__ . '/../model/results.json');
+            $GALang = $this->model->changeLangValue($language);
+            $url = $this->model->getUrl($title, $author, $year, $GALang, $isGA);
         } else {
-            $items = $this->model->getFileResults( __DIR__ . '/../model/bhlresults.json');
-            //$url = $this->model->getUrl($title, $author, $year, $language, $isGA);
+            //$items = $this->model->getFileResults( __DIR__ . '/../model/bhlresults.json');
+            $url = $this->model->getUrl($title, $author, $year, $language, $isGA);
         }
-        //$items = $this->model->getAPIResults($url, $isGA);
+        $items = $this->model->getAPIResults($url, $isGA);
         $books = $this->model->createBooks($items, $isGA);
         return $books;
     }

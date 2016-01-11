@@ -32,13 +32,14 @@ abstract class Book {
 
     public function getTitleListItem() {
         if($this->titleUrl !== '' && $this->title !== '') {
-            return '<li><a href="' . $this->titleUrl . '" target="_blank">' . $this->title . '</a></li>';
+            return '<li><a href="' . htmlspecialchars($this->titleUrl) . '" target="_blank">' .
+            htmlspecialchars($this->title) . '</a></li>';
         } elseif($this->titleUrl === '' && $this->title === '') {
             return '<li>No title</li>';
         } elseif($this->title === '') {
-            return '<li><a href="' . $this->titleUrl . '" target="_blank">No title</a></li>';
+            return '<li><a href="' . htmlspecialchars($this->titleUrl) . '" target="_blank">No title</a></li>';
         } else {
-            return '<li>' . $this->title . '</li>';
+            return '<li>' . htmlspecialchars($this->title) . '</li>';
         }
     }
 
@@ -58,7 +59,7 @@ abstract class Book {
         if($this->itemUrl === '') {
             return '<li></li>';
         } else {
-            return '<li><a href="' . $this->itemUrl . '" target="_blank">View book</a></li>';
+            return '<li><a href="' . htmlspecialchars($this->itemUrl) . '" target="_blank">View book</a></li>';
         }
     }
 
@@ -84,9 +85,9 @@ abstract class Book {
 
     public function setLanguage($language) {
         if($language !== null) {
-            $this->language = $language;
+            $this->lang = $language;
         } else {
-            $this->language = "";
+            $this->lang = "";
         }
     }
 

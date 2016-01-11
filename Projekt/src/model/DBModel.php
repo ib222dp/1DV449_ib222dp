@@ -18,11 +18,11 @@ class DBModel extends MainModel
     public function getSearchTerm($title) {
         $result = $this->DBDAO->getSearchTerm($title);
         if($result !== null) {
-            //if(($result->saved_date - time()) <= 300) {
-            return array($result->Id, true);
-            //} else {
-            //  return array($result->Id, false);
-            //}
+            if(($result->saved_date - time()) <= 300) {
+                return array($result->Id, true);
+            } else {
+                return array($result->Id, false);
+            }
         } else {
             return null;
         }
@@ -65,7 +65,9 @@ class DBModel extends MainModel
     public function saveResults($title, $BHLBooks, $GABooks) {
         $titleId = $this->DBDAO->saveSearchTerm($title);
         if($titleId !== null) {
-            $result = $this->DBDAO->saveSearchResults($titleId, $BHLBooks, $GABooks);
+            if($this->DBDAO->saveSearchResults($titleId, $BHLBooks, $GABooks) !== true) {
+                $this->DBDAO->deleteSearchTerm($titleId);
+            }
         }
     }
 

@@ -125,7 +125,7 @@ class APIModel extends MainModel
                 array_push($books, $book);
             }
             //http://stackoverflow.com/questions/4282413/sort-array-of-objects-by-object-fields
-            //usort($books, array($this, 'cmp'));
+            usort($books, array($this, 'cmp'));
         }
         return $books;
     }

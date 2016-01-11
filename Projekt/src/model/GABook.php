@@ -28,7 +28,7 @@ class GABook extends Book {
                 $i++;
             }
             if(empty($this->coAuthors)) {
-                $this->addCoAuthor('No coauthors');
+                $this->addCoAuthor(new Author('No coauthors'));
             }
         } elseif(($author === null) && ($contributor !== null && $contributor->def !== null && !empty($contributor->def))) {
             $i = 0;
@@ -42,12 +42,12 @@ class GABook extends Book {
                 $i++;
             }
             if(empty($this->coAuthors)) {
-                $this->addCoAuthor('No coauthors');
+                $this->addCoAuthor(new Author('No coauthors'));
             }
         } else {
             $this->setAuthor(new Author('No author'));
             $this->setContributor(new Contributor('No contributor'));
-            $this->addCoAuthor('No coauthors');
+            $this->addCoAuthor(new Author('No coauthors'));
         }
     }
 
@@ -63,18 +63,20 @@ class GABook extends Book {
         if($this->year === "") {
             return '<li></li>';
         } else {
-            return '<li>Year: ' . $this->year . '</li>';
+            return '<li>Year: ' . htmlspecialchars($this->year) . '</li>';
         }
     }
 
     public function getAuthorListItem() {
         if($this->author->getName() !== 'No author') {
-            $list = 'By: ' . $this->author->getName() . ' -- ';
+            $list = 'By: ' . htmlspecialchars($this->author->getName()) . ' -- ';
         } elseif($this->contributor->getName() !== 'No contributor') {
-            $list = 'Contributor: ' . $this->contributor->getName() . ' -- ';
+            $list = 'Contributor: ' . htmlspecialchars($this->contributor->getName()) . ' -- ';
         }
-        foreach($this->coAuthors as $author) {
-            $list .= $author->getName() . ' -- ';
+        if($this->coAuthors[0]->getName() !== "No coauthors") {
+            foreach($this->coAuthors as $author) {
+                $list .= htmlspecialchars($author->getName()) . ' -- ';
+            }
         }
         $list = rtrim($list, ' -- ');
         return '<li>' . $list . '</li>';
