@@ -95,13 +95,31 @@ class APIModel extends MainModel
 
     public function getAPIResults($url, $isGA) {
         $data = $this->APIDAO->getData($url);
-        $results = json_decode($data);
-        if($isGA) {
-            $items = $results->items;
+        if($data === null) {
+            $this->setErrorMessage("Something went wrong while fetching data from the API:s.");
+            return null;
         } else {
-            $items = $results->Result;
+            $results = json_decode($data);
+            if($isGA) {
+                if($results->success === true) {
+                    $items = $results->items;
+                } else {
+                    $this->setErrorMessage("Something went wrong while fetching data from the API:s.");
+                    return null;
+                }
+            } else {
+                if($results->Status === 'ok') {
+                    $items = $results->Result;
+                } else {
+                    $this->setErrorMessage("Something went wrong while fetching data from the API:s.");
+                    return null;
+                }
+            }
+            if($items === null) {
+                $items = array();
+            }
+            return $items;
         }
-        return $items;
     }
 
     public function cmp($a, $b) {

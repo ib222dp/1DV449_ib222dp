@@ -17,9 +17,9 @@ class APIDAO {
     public function getData($url) {
         $ch = $this->startCURL($url);
         $data = curl_exec($ch);
-        if($data == false) {
+        if($data === false) {
             curl_close($ch);
-            die('<a href="index.php">Tillbaka</a><p>Något gick fel.</p>');
+            return null;
         } else {
             curl_close($ch);
             return $data;

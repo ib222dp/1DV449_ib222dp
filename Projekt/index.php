@@ -1,15 +1,12 @@
 <?php
-
-require_once("MainView.php");
-require_once("src/controller/SearchController.php");
+require_once("MainHTMLView.php");
+require_once("src/controller/MainController.php");
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-$MainView = new MainView();
-$searchController = new SearchController();
-
-$htmlBody = $searchController->start();
-
-$MainView->echoHTML($htmlBody[0], $htmlBody[1]);
+$mainHTMLView = new MainHTMLView();
+$mainController = new MainController();
+$htmlBody = $mainController->start();
+$mainHTMLView->echoHTML($htmlBody[0], $htmlBody[1]);

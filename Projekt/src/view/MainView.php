@@ -1,6 +1,6 @@
 <?php
 
-class APIView
+class MainView
 {
     private $model;
     private $button;

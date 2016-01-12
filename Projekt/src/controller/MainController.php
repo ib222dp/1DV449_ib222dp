@@ -1,18 +1,19 @@
 <?php
+require_once("DBController.php");
 require_once("src/model/MainModel.php");
 require_once("src/model/APIModel.php");
-require_once("src/view/APIView.php");
-require_once("DBController.php");
+require_once("src/view/MainView.php");
 
-class SearchController {
+class MainController {
+    private $DBController;
     private $model;
     private $view;
-    private $DBController;
+
 
     public function __construct() {
-        $this->model = new APIModel();
-        $this->view = new APIView($this->model);
         $this->DBController = new DBController();
+        $this->model = new APIModel();
+        $this->view = new MainView($this->model);
     }
 
     public function getAPIResults($title, $author, $year, $language, $isGA) {
@@ -25,8 +26,12 @@ class SearchController {
             $url = $this->model->getUrl($title, $author, $year, $language, $isGA);
         }
         $items = $this->model->getAPIResults($url, $isGA);
-        $books = $this->model->createBooks($items, $isGA);
-        return $books;
+        if($items === null) {
+            header('Location: index.php');
+        } else {
+            $books = $this->model->createBooks($items, $isGA);
+            return $books;
+        }
     }
 
     public function start() {

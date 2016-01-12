@@ -1,10 +1,10 @@
 <?php
 
-class MainView {
+class MainHTMLView {
 
     public function echoHTML($body, $isStartPage) {
         $start =   '<!DOCTYPE html>
-                    <html lang="sv">
+                    <html lang="en">
 			        <head>
 				        <title>Botany Books Online</title>
 				        <meta charset="utf-8" />
@@ -13,7 +13,7 @@ class MainView {
                             crossorigin="anonymous">
 			        </head>
 			        <body>
-                        <div class="container">
+                        <div class="container" id="content">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="jumbotron">
@@ -32,7 +32,7 @@ class MainView {
                         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
                         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
                         integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-			        </body>
+                    </body>
                 </html>';
         echo $start . $header . $end;
     }
