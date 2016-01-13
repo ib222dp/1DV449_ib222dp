@@ -63,19 +63,19 @@ class GABook extends Book {
         if($this->year === "") {
             return '<li></li>';
         } else {
-            return '<li>Year: ' . htmlspecialchars($this->year) . '</li>';
+            return '<li>Year: ' . htmlspecialchars($this->year, ENT_QUOTES) . '</li>';
         }
     }
 
     public function getAuthorListItem() {
         if($this->author->getName() !== 'No author') {
-            $list = 'By: ' . htmlspecialchars($this->author->getName()) . ' -- ';
+            $list = 'By: ' . htmlspecialchars($this->author->getName(), ENT_QUOTES) . ' -- ';
         } elseif($this->contributor->getName() !== 'No contributor') {
-            $list = 'Contributor: ' . htmlspecialchars($this->contributor->getName()) . ' -- ';
+            $list = 'Contributor: ' . htmlspecialchars($this->contributor->getName(), ENT_QUOTES) . ' -- ';
         }
         if($this->coAuthors[0]->getName() !== "No coauthors") {
             foreach($this->coAuthors as $author) {
-                $list .= htmlspecialchars($author->getName()) . ' -- ';
+                $list .= htmlspecialchars($author->getName(), ENT_QUOTES) . ' -- ';
             }
         }
         $list = rtrim($list, ' -- ');

@@ -13,7 +13,11 @@ class DBDAO {
     }
 
     public function getSearchTerm($title) {
+        if($this->dbc->connect_errno) {
+            exit();
+        }
         $escTitle = $this->dbc->real_escape_string($title);
+
         if(mysqli_set_charset($this->dbc, 'utf8')) {
             $result = $this->dbc->query("SELECT * FROM titlesearch WHERE title='" . $escTitle . "'");
             if(mysqli_num_rows($result) === 1) {
@@ -28,6 +32,9 @@ class DBDAO {
     }
 
     public function getBooks($titleId, $author, $year, $language, $isGA) {
+        if($this->dbc->connect_errno) {
+            exit();
+        }
         if(!empty($author)) {
             $escAuth = $this->dbc->real_escape_string($author);
         }
@@ -96,35 +103,44 @@ class DBDAO {
         }
     }
 
-    public function updateSearchTerm($titleId) {
-        if(mysqli_set_charset($this->dbc, "utf8")) {
-            $time = time();
-            $this->dbc->query("UPDATE titlesearch SET saved_date='" . $time . "' WHERE Id='" . $titleId . "'");
-        } else {
+    //http://www.pontikis.net/blog/how-to-use-php-improved-mysqli-extension-and-why-you-should
+    public function saveSearchResults($title, $BHLBooks, $GABooks, $isNewTitle) {
+        if($this->dbc->connect_errno) {
             exit();
         }
-    }
-
-    public function saveSearchTerm($title) {
-        $escTitle = $this->dbc->real_escape_string($title);
-        $time = time();
-        $query = "INSERT INTO titlesearch (`Id`, `title`, `saved_date`)
-                  VALUES (NULL,'$escTitle', '$time')";
-        if(mysqli_set_charset($this->dbc, "utf8")) {
-            if($result = $this->dbc->query($query)) {
-                return $this->dbc->insert_id;
-            } else {
-                return null;
-            }
-        } else {
-            exit();
-        }
-    }
-
-    public function saveSearchResults($titleId, $BHLBooks, $GABooks) {
         if(mysqli_set_charset($this->dbc, "utf8")) {
             try {
                 $this->dbc->autocommit(false);
+
+                if($isNewTitle) {
+                    $time = time();
+                    $titleQuery = "INSERT INTO titlesearch (Id, title, saved_date)
+                                                    VALUES (NULL, ?, ?)";
+                    $titleStmt = $this->dbc->prepare($titleQuery);
+                    $titleStmt->bind_param("si", $title, $time);
+                    if($titleStmt->execute() === false) {
+                        throw new Exception($this->dbc->error);
+                    }
+                    $titleId = $this->dbc->insert_id;
+                } else {
+                    $titleQuery = "SELECT Id, title FROM titlesearch WHERE title= ?";
+                    $titleStmt = $this->dbc->prepare($titleQuery);
+                    $titleStmt->bind_param("s", $title);
+                    if($titleStmt->execute() === false) {
+                        throw new Exception($this->dbc->error);
+                    }
+                    $titleStmt->bind_result($TId, $searchTerm);
+                    while($titleStmt->fetch()) {
+                        $titleId = $TId;
+                    }
+
+                    $delResult = $this->dbc->query("DELETE FROM bhlbook WHERE titlesearch_id='" . $titleId . "'");
+                    $delResult2 = $this->dbc->query("DELETE FROM gabook WHERE titlesearch_id='" . $titleId . "'");
+                    if($delResult === false || $delResult2 === false) {
+                        throw new Exception($this->dbc->error);
+                    }
+                }
+
                 if(!empty($BHLBooks)) {
                     foreach($BHLBooks as $BHLBook) {
                         $titleUrl = $BHLBook->getTitleUrl();
@@ -317,13 +333,20 @@ class DBDAO {
                         }
                     }
                 }
+
+                if(!$isNewTitle) {
+                    $time = time();
+                    $updResult = $this->dbc->query("UPDATE titlesearch SET saved_date='" . $time . "' WHERE Id='" . $titleId . "'");
+                    if($updResult === false) {
+                        throw new Exception($this->dbc->error);
+                    }
+                }
+
                 $this->dbc->commit();
                 $this->dbc->autocommit(true);
-                return true;
             } catch(Exception $e) {
                 $this->dbc->rollback();
                 $this->dbc->autocommit(true);
-                return false;
             }
         } else {
             exit();
@@ -331,31 +354,11 @@ class DBDAO {
     }
 
     public function deleteSearchTerm($titleId) {
-        if(mysqli_set_charset($this->dbc, "utf8")) {
-            $this->dbc->query("DELETE FROM titlesearch WHERE Id='" . $titleId . "'");
-        } else {
+        if($this->dbc->connect_errno) {
             exit();
         }
-    }
-
-    //http://www.pontikis.net/blog/how-to-use-php-improved-mysqli-extension-and-why-you-should
-    public function deleteSearchResults($titleId) {
         if(mysqli_set_charset($this->dbc, "utf8")) {
-            try {
-                $this->dbc->autocommit(false);
-                $result = $this->dbc->query("DELETE FROM bhlbook WHERE titlesearch_id='" . $titleId . "'");
-                $result2 = $this->dbc->query("DELETE FROM gabook WHERE titlesearch_id='" . $titleId . "'");
-                if($result === false || $result2 === false) {
-                    throw new Exception();
-                }
-                $this->dbc->commit();
-                $this->dbc->autocommit(true);
-                return true;
-            } catch(Exception $e) {
-                $this->dbc->rollback();
-                $this->dbc->autocommit(true);
-                return false;
-            }
+            $this->dbc->query("DELETE FROM titlesearch WHERE Id='" . $titleId . "'");
         } else {
             exit();
         }

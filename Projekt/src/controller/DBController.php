@@ -10,8 +10,8 @@ class DBController {
     }
 
     public function getSearchTerm($title) {
-        $titleId = $this->model->getSearchTerm($title);
-        return $titleId;
+        $DBTitle = $this->model->getSearchTerm($title);
+        return $DBTitle;
     }
 
     public function getBooks($titleId, $author, $year, $language) {
@@ -20,12 +20,8 @@ class DBController {
         return array($BHLBooks, $GABooks);
     }
 
-    public function saveResults($title, $BHLBooks, $GABooks) {
-        $this->model->saveResults($title, $BHLBooks, $GABooks);
-    }
-
-    public function saveNewResults($titleId, $BHLBooks, $GABooks) {
-        $this->model->saveNewResults($titleId, $BHLBooks, $GABooks);
+    public function saveResults($title, $BHLBooks, $GABooks, $isNewTitle) {
+        $this->model->saveResults($title, $BHLBooks, $GABooks, $isNewTitle);
     }
 
     public function deleteSearchTerm($titleId) {

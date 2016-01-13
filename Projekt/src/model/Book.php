@@ -32,14 +32,14 @@ abstract class Book {
 
     public function getTitleListItem() {
         if($this->titleUrl !== '' && $this->title !== '') {
-            return '<li><a href="' . htmlspecialchars($this->titleUrl) . '" target="_blank">' .
-            htmlspecialchars($this->title) . '</a></li>';
+            return '<li><a href="' . htmlspecialchars($this->titleUrl, ENT_QUOTES) . '" target="_blank">' .
+            htmlspecialchars($this->title, ENT_QUOTES) . '</a></li>';
         } elseif($this->titleUrl === '' && $this->title === '') {
             return '<li>No title</li>';
         } elseif($this->title === '') {
-            return '<li><a href="' . htmlspecialchars($this->titleUrl) . '" target="_blank">No title</a></li>';
+            return '<li><a href="' . htmlspecialchars($this->titleUrl, ENT_QUOTES) . '" target="_blank">No title</a></li>';
         } else {
-            return '<li>' . htmlspecialchars($this->title) . '</li>';
+            return '<li>' . htmlspecialchars($this->title, ENT_QUOTES) . '</li>';
         }
     }
 
@@ -59,7 +59,7 @@ abstract class Book {
         if($this->itemUrl === '') {
             return '<li></li>';
         } else {
-            return '<li><a href="' . htmlspecialchars($this->itemUrl) . '" target="_blank">View book</a></li>';
+            return '<li><a href="' . htmlspecialchars($this->itemUrl, ENT_QUOTES) . '" target="_blank">View book</a></li>';
         }
     }
 

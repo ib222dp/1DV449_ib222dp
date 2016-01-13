@@ -18,10 +18,10 @@ class DBModel extends MainModel
     public function getSearchTerm($title) {
         $result = $this->DBDAO->getSearchTerm($title);
         if($result !== null) {
-            if(($result->saved_date - time()) <= 300) {
-                return array($result->Id, true);
+            if((time() - (int)$result->saved_date) <= 300) {
+                return array($result, true);
             } else {
-                return array($result->Id, false);
+                return array($result, false);
             }
         } else {
             return null;
@@ -62,23 +62,8 @@ class DBModel extends MainModel
         return $books;
     }
 
-    public function saveResults($title, $BHLBooks, $GABooks) {
-        $titleId = $this->DBDAO->saveSearchTerm($title);
-        if($titleId !== null) {
-            if($this->DBDAO->saveSearchResults($titleId, $BHLBooks, $GABooks) !== true) {
-                $this->DBDAO->deleteSearchTerm($titleId);
-            }
-        }
-    }
-
-    public function saveNewResults($titleId, $BHLBooks, $GABooks) {
-        if($this->DBDAO->deleteSearchResults($titleId) === true) {
-            if($this->DBDAO->saveSearchResults($titleId, $BHLBooks, $GABooks) === true) {
-                $this->DBDAO->updateSearchTerm($titleId);
-            } else {
-                $this->DBDAO->deleteSearchTerm($titleId);
-            }
-        }
+    public function saveResults($title, $BHLBooks, $GABooks, $isNewTitle) {
+        $this->DBDAO->saveSearchResults($title, $BHLBooks, $GABooks, $isNewTitle);
     }
 
     public function deleteSearchTerm($titleId) {

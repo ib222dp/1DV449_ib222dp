@@ -34,7 +34,7 @@ class BHLBook extends Book {
         if($this->edition === '') {
             return '<li></li>';
         } else {
-            return '<li>Edition: ' . htmlspecialchars($this->edition) . '</li>';
+            return '<li>Edition: ' . htmlspecialchars($this->edition, ENT_QUOTES) . '</li>';
         }
     }
 
@@ -66,8 +66,8 @@ class BHLBook extends Book {
         if($this->pubPlace === '' && $this->pubName === '' && $this->year === '') {
             return '<li></li>';
         } else {
-            return '<li>Publication info: ' . htmlspecialchars($this->pubPlace) . ' ' .
-            htmlspecialchars($this->pubName) . ' ' . htmlspecialchars($this->year) . '</li>';
+            return '<li>Publication info: ' . htmlspecialchars($this->pubPlace, ENT_QUOTES) . ' ' .
+            htmlspecialchars($this->pubName, ENT_QUOTES) . ' ' . htmlspecialchars($this->year, ENT_QUOTES) . '</li>';
         }
     }
 
@@ -87,7 +87,7 @@ class BHLBook extends Book {
         if($this->provider === '') {
             return '<li></li>';
         } else {
-            return '<li>Provided by: ' . htmlspecialchars($this->provider) . '</li>';
+            return '<li>Provided by: ' . htmlspecialchars($this->provider, ENT_QUOTES) . '</li>';
         }
     }
 
@@ -96,14 +96,14 @@ class BHLBook extends Book {
             return '<li></li>';
         } else {
             if($this->author->getName() !== 'No author') {
-                $list = htmlspecialchars($this->author->getName()) . ' -- ';
+                $list = htmlspecialchars($this->author->getName(), ENT_QUOTES) . ' -- ';
             }
 
             foreach($this->coAuthors as $author) {
                 if($author->getName() === 'No coauthors') {
                     break;
                 } else {
-                    $list .= htmlspecialchars($author->getName()) . ' -- ';
+                    $list .= htmlspecialchars($author->getName(), ENT_QUOTES) . ' -- ';
                 }
             }
             $list = rtrim($list, ' -- ');

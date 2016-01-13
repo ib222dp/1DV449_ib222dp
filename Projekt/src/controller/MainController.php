@@ -18,11 +18,9 @@ class MainController {
 
     public function getAPIResults($title, $author, $year, $language, $isGA) {
         if($isGA) {
-            //$items = $this->model->getFileResults(__DIR__ . '/../model/results.json');
             $GALang = $this->model->changeLangValue($language);
             $url = $this->model->getUrl($title, $author, $year, $GALang, $isGA);
         } else {
-            //$items = $this->model->getFileResults( __DIR__ . '/../model/bhlresults.json');
             $url = $this->model->getUrl($title, $author, $year, $language, $isGA);
         }
         $items = $this->model->getAPIResults($url, $isGA);
@@ -45,30 +43,30 @@ class MainController {
             } else {
                 if($this->model->yearOk($year)) {
                     if(!empty($title)) {
-                        $titleId = $this->DBController->getSearchTerm($title);
-                        if(is_array($titleId)) {
-                            if($titleId[1] == true){
-                                $books = $this->DBController->getBooks($titleId[0], $author, $year, $language);
+                        $DBTitle = $this->DBController->getSearchTerm($title);
+                        if(is_array($DBTitle)) {
+                            if($DBTitle[1] === true){
+                                $books = $this->DBController->getBooks($DBTitle[0]->Id, $author, $year, $language);
                                 $BHLBooks = $books[0];
                                 $GABooks = $books[1];
                             } else {
                                 $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
                                 $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
-                                /*if(empty($author) && empty($year) && $language === "NONE" && !empty($BHLBooks) ||
-                                   empty($author) && empty($year) && $language === "NONE" && !empty($GABooks)) {
-                                    $this->DBController->saveNewResults($titleId[0], $BHLBooks, $GABooks);
+                                if(empty($author) && empty($year) && $language === "NONE" && !empty($BHLBooks) ||
+                                    empty($author) && empty($year) && $language === "NONE" && !empty($GABooks)) {
+                                    $this->DBController->saveResults($DBTitle[0]->title, $BHLBooks, $GABooks, false);
                                 } else {
-                                    $this->DBController->deleteSearchTerm($titleId[0]);
-                                }*/
+                                    $this->DBController->deleteSearchTerm($DBTitle[0]->Id);
+                                }
                             }
                         } else {
                             $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
                             $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
-                            /*if(empty($author) && empty($year) && $language === "NONE") {
+                            if(empty($author) && empty($year) && $language === "NONE") {
                                 if(!empty($BHLBooks) || !empty($GABooks)) {
-                                    $this->DBController->saveResults($title, $BHLBooks, $GABooks);
+                                    $this->DBController->saveResults($title, $BHLBooks, $GABooks, true);
                                 }
-                            }*/
+                            }
                         }
                     } else {
                         $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
