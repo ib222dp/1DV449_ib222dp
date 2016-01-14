@@ -148,8 +148,8 @@ class MainView
             }
 
         }
-        return  '<div class="row"><div class="col-md-6"><h4>Results from Gallica</h4>' . $gList .
-        '</div><div class="col-md-6"><h4>Results from BHL</h4>' . $bList . '</div></div></div>';
+        return  '<div class="row"><div class="col-md-6" id="bhlbooks"><h4>Results from BHL</h4>' . $bList .
+        '</div><div class="col-md-6" id="gabooks"><h4>Results from Gallica</h4>' . $gList . '</div></div></div>';
     }
 
     public function showSearchForm() {

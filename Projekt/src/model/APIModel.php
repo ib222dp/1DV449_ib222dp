@@ -28,6 +28,7 @@ class APIModel extends MainModel
         return $param;
     }
 
+    //Skapar URL:er till API:erna beroende på vilka parametrar användaren angett
     public function getUrl($title, $author, $year, $language, $isGA) {
         if(!empty($title)) {
             $trTitle = $this->trimParam($title);
@@ -122,6 +123,7 @@ class APIModel extends MainModel
         }
     }
 
+    //http://stackoverflow.com/questions/4282413/sort-array-of-objects-by-object-fields
     public function cmp($a, $b) {
         return strcmp($a->getTitle(), $b->getTitle());
     }

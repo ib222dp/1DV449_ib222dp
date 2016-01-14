@@ -9,13 +9,13 @@ class MainController {
     private $model;
     private $view;
 
-
     public function __construct() {
         $this->DBController = new DBController();
         $this->model = new APIModel();
         $this->view = new MainView($this->model);
     }
 
+    //Hämtar böcker från API:erna
     public function getAPIResults($title, $author, $year, $language, $isGA) {
         if($isGA) {
             $GALang = $this->model->changeLangValue($language);
@@ -43,12 +43,15 @@ class MainController {
             } else {
                 if($this->model->yearOk($year)) {
                     if(!empty($title)) {
+                        //Kontrollerar om titeln redan finns i databasen
                         $DBTitle = $this->DBController->getSearchTerm($title);
                         if(is_array($DBTitle)) {
+                            //Hämtar resultat från cachen om de inte är för gamla
                             if($DBTitle[1] === true){
                                 $books = $this->DBController->getBooks($DBTitle[0]->Id, $author, $year, $language);
                                 $BHLBooks = $books[0];
                                 $GABooks = $books[1];
+                                //Om resultaten i databasen är för gamla hämtas nya resultat från API:erna och sparas i databasen
                             } else {
                                 $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
                                 $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
@@ -60,6 +63,7 @@ class MainController {
                                 }
                             }
                         } else {
+                            //Om titeln inte fanns i databasen hämtas resultat från API:erna och sparas i databasen
                             $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
                             $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
                             if(empty($author) && empty($year) && $language === "NONE") {
@@ -69,11 +73,13 @@ class MainController {
                             }
                         }
                     } else {
+                        //Om användaren inte har angett någon titel hämtas resultaten från API:erna och sparas ej i databasen
                         $BHLBooks = $this->getAPIResults($title, $author, $year, $language, false);
                         $GABooks = $this->getAPIResults($title, $author, $year, $language, true);
                     }
                     $this->model->saveResultsinSession($BHLBooks, $GABooks);
                 }
+                //PRG
                 header('Location: index.php');
             }
         } else {

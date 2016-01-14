@@ -107,10 +107,4 @@ abstract class MainModel
         $_SESSION['GABooks'] = $GABooks;
     }
 
-    public function getFileResults($fileUrl) {
-        $fileContents = file_get_contents($fileUrl);
-        $results = json_decode($fileContents);
-        return $results;
-    }
-
 }

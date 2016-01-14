@@ -13,7 +13,7 @@ material hämtas via Europeanas API. BHL:s material hämtas från deras API.
 
 # Applikationens beståndsdelar - Google Docs
   
-[Schematisk bild](https://docs.google.com/document/d/11tlq-4DHs-rW8pJuzJd-9RdyJ-s7xIky-cCwYn3KQbs/edit?usp=sharing)
+[Schematisk bild](https://docs.google.com/document/d/11tlq-4DHs-rW8pJuzJd-9RdyJ-s7xIky-cCwYn3KQbs/edit?usp=sharing)  
 [DB - Relationsschema](https://docs.google.com/document/d/1AchY1QlCHjMJzbH1u3dovml0MAMJ-ahXVn59H_Tw07Y/edit?usp=sharing)
 
 # Säkerhet
@@ -38,7 +38,8 @@ Javascript-filer och CSS-filer cachas i allmänhet, medan HTML-dokument som har 
 cachas. Om CSS och Javascript lyfts ut från HTML-dokumentet blir det mindre och går därför snabbare att läsa in 
 [4, s. 56].  
 Minifiering innebär att ta bort onödiga tecken från kod för att minska dess storlek, och därmed förkorta laddningstider. 
-Alla kommentarer och blanktecken tas bort [4, s. 69].  
+Alla kommentarer och blanktecken tas bort [4, s. 69]. Jag har även minifierat Javascript-filen som hanterar 
+localStorage (ls.min.js).
 Jag har aktiverat [komprimering med Gzip på servern](http://salscode.com/tutorials/2009/10/15/gzip-htaccess/). Med hjälp 
 av komprimeringsprogrammet Gzip kan storleken på http-svar minskas, vilket leder till kortare svarstider [4, s. 29-30].  
 I många webbläsare förhindras progressiv rendering om man placerar CSS längst ner i ett HTML-dokument. Webbläsare 
@@ -52,7 +53,7 @@ längst ner på sidan [4, s. 49], vilket jag har gjort.
 
 ## Cachning
 
-[DB - Relationsschema](https://docs.google.com/document/d/1AchY1QlCHjMJzbH1u3dovml0MAMJ-ahXVn59H_Tw07Y/edit?usp=sharing)
+[DB - Relationsschema](https://docs.google.com/document/d/1AchY1QlCHjMJzbH1u3dovml0MAMJ-ahXVn59H_Tw07Y/edit?usp=sharing)  
 När sökresultat hämtas från API:erna cachas de i en MySQL-databas. Resultaten har en 1 till många-relation till en titel 
 som användaren sökt på, det vill säga en titel kan ha många resultat men ett resultat kan bara höra till en titel. Om 
 samma sökning görs igen kontrolleras det om titeln finns i databasen, och om det har gått mer än 5 minuter sedan titeln 
@@ -68,7 +69,19 @@ i databasen.
 
 # Offline-first
 
-
+Eftersom min webbplats inte har några SSL-certifikat så har jag använt AppCache och localStorage. Jag har en html-sida 
+(offline.html), vars html-tagg har attributet "manifest=cache.appcache". I min manifest-fil (cache.appcache) har jag 
+angivit offline.html som min "fallback"-sida, och att Javascript-filen ls.min.js ska cachas. För att offline.html-sidan 
+ska kunna cachas måste den besökas, så därför har jag lagt in den som en iframe i filen index.php. I Javascript-filen 
+ls.min.js kontrolleras först om Jquery har laddats in. Eftersom jag har lagt in Jquery-skriptet på offline.html som en 
+länk till en CDN-tjänst misslyckas inläsningen om man är offline, så på detta sätt kan jag kontrollera om användaren är 
+offline. Jag testade att kontrollera anslutningen genom att skicka ett anrop till en bild på min server, men jag 
+lyckades inte få det att fungera. Bilden lästes in från cachen även om jag lade till en slumpmässig sträng efter länken 
+till bilden. Om användaren inte är offline sparas sökresultaten till ett localStorage-item. Om användaren sedan går 
+offline så hämtas detta localStorage-item och sökresultaten skrivs ut i DOM:en tillsammans med meddelandet "You seem to 
+have lost your Internet connection. Here are your latest search results". Jag har inte lyckats få detta att fungera för 
+POST-requests, endast GET-requests, så det fungerar alltså inte om man klickar på Submit-knappen i sökformuläret när man 
+är offline.
 
 # Risker
 
@@ -96,8 +109,9 @@ API:et lite väl mycket så gör jag inga extra anrop och får därför inte red
 spara bokens språk i databasen. Filtrering på språk fungerar därför inte på böcker från BHL om resultaten kommer från 
 cachen.  
 Det blir antagligen också en del duplicerade sökresultat i databasen om till exempel en sökning görs på "Origin of 
-species" och en annan sökning görs på endast "species", men jag har inte lyckats komma på en lösning som undviker detta.  
-Övriga funktioner som jag skulle vilja lägga till är att inkludera sökresultat från Google Books, och att ha fler 
+species" och en annan sökning görs på endast "species", men jag har inte lyckats komma på en lösning som undviker detta. 
+Jag har inte heller hunnit implementera en lösning för att undvika att till exempel både titeln "Origin of species" och 
+"Origin species" hamnar i databasen. Övriga funktioner som jag skulle vilja lägga till är att inkludera sökresultat från Google Books, och att ha fler 
 alternativ för avancerad sökning. Jag skulle också kunna lägga till en möjlighet att logga in på sitt Google-konto eller 
 sitt Europeana-konto via min applikation.
 

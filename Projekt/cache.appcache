@@ -1,0 +1,10 @@
+CACHE MANIFEST
+# v1 2016-01-12
+CACHE:
+ls.min.js
+
+NETWORK:
+*
+
+FALLBACK:
+/ offline.html
