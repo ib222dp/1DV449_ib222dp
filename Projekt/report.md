@@ -7,7 +7,7 @@ Jag har skapat en webbplats där botaniker kan söka i [BHL(Biodiversity Heritag
 Jag blev inspirerad av [denna bloggpost](http://blog.biodiversitylibrary.org/2012/04/bhl-and-our-users-anders-hagborg.html), 
 där Anders Hagborg berättar att han skulle vilja kunna söka i bland annat BHL, Gallica och Google Books samtidigt.
 Såvitt jag vet finns det inga applikationer där man kan söka i BHL och Gallica samtidigt. Jag har skapat applikationen i
- PHP, och anropar API:en via CURL. Datat hämtas i JSON-format, och cachas i en MySQL-databas.
+ PHP, och anropar API:erna via CURL. Datat hämtas i JSON-format, och cachas i en MySQL-databas.
 Gallica har inget eget API, men de bidrar med sitt material till [Europeana](http://www.europeana.eu/portal/), så deras 
 material hämtas via Europeanas API. BHL:s material hämtas från deras API.
 
@@ -39,7 +39,7 @@ cachas. Om CSS och Javascript lyfts ut från HTML-dokumentet blir det mindre och
 [4, s. 56].  
 Minifiering innebär att ta bort onödiga tecken från kod för att minska dess storlek, och därmed förkorta laddningstider. 
 Alla kommentarer och blanktecken tas bort [4, s. 69]. Jag har även minifierat Javascript-filen som hanterar 
-localStorage (ls.min.js).
+localStorage (ls.min.js).  
 Jag har aktiverat [komprimering med Gzip på servern](http://salscode.com/tutorials/2009/10/15/gzip-htaccess/). Med hjälp 
 av komprimeringsprogrammet Gzip kan storleken på http-svar minskas, vilket leder till kortare svarstider [4, s. 29-30].  
 I många webbläsare förhindras progressiv rendering om man placerar CSS längst ner i ett HTML-dokument. Webbläsare 
