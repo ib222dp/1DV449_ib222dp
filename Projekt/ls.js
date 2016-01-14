@@ -9,7 +9,6 @@ if (typeof jQuery == "undefined") {
         for (var j = 0; j < latestBooks.length; j++) {
             if (latestBooks[j] === "endBHL") {
                 var li = document.createElement("li");
-                var strong = document.createElement("strong");
                 li.innerHTML = "<strong>Results from Gallica</strong>";
                 ul.appendChild(li);
             } else {
