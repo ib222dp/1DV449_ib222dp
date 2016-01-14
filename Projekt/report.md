@@ -69,7 +69,7 @@ i databasen.
 
 # Offline-first
 
-Eftersom min webbplats inte har några SSL-certifikat så har jag använt AppCache och localStorage. Jag har en html-sida 
+Eftersom min webbplats inte har några SSL-certifikat så har jag använt AppCache i stället för Service Workers, och localStorage. Jag har en html-sida 
 (offline.html), vars html-tagg har attributet "manifest=cache.appcache". I min manifest-fil (cache.appcache) har jag 
 angivit offline.html som min "fallback"-sida, och att Javascript-filen ls.min.js ska cachas. För att offline.html-sidan 
 ska kunna cachas måste den besökas, så därför har jag lagt in den som en iframe i filen index.php. I Javascript-filen 
